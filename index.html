@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Control de Asistencia Biométrico</title>
+    
+    <!-- Tailwind CSS para diseño -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Iconos Lucide -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- Face-API.js para Reconocimiento Facial -->
+    <script src="https://cdn.jsdelivr.net/npm/@vladmandic/face-api@1.7.12/dist/face-api.min.js"></script>
+
+    <style>
+        .glow-cyan { box-shadow: 0 0 15px rgba(6, 182, 212, 0.4); }
+        .glow-emerald { box-shadow: 0 0 15px rgba(16, 185, 129, 0.4); }
+        
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #0f172a; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
+        
+        /* Animación para notificaciones */
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        .toast-enter { animation: slideIn 0.3s ease-out forwards; }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 font-sans h-full flex flex-col overflow-hidden relative">
+
+    <!-- Contenedor de Notificaciones -->
+    <div id="toastContainer" class="fixed top-20 right-6 z-50 flex flex-col gap-3 w-80 pointer-events-none"></div>
+
+    <!-- Encabezado Principal -->
+    <header class="bg-slate-900 border-b border-slate-800 px-6 py-4 flex flex-wrap justify-between items-center gap-4 shrink-0 shadow-md z-10">
+        <div class="flex items-center gap-3">
+            <div class="bg-cyan-500/10 p-2 rounded-lg border border-cyan-500/20 text-cyan-400">
+                <i data-lucide="scan-face" class="w-6 h-6 animate-pulse"></i>
+            </div>
+            <div>
+                <h1 class="text-lg font-bold tracking-tight flex items-center gap-2">
+                    BioAccess <span class="text-xs bg-cyan-500/20 text-cyan-400 px-2 py-0.5 rounded border border-cyan-500/30">PRO</span>
+                </h1>
+                <p class="text-xs text-slate-400">Control de Asistencia Biométrico</p>
+            </div>
+        </div>
+        
+        <div class="flex items-center gap-3">
+            <div id="cloudStatus" class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-800 border border-slate-700 text-slate-400 text-xs font-medium">
+                <i data-lucide="cloud-off" class="w-4 h-4"></i>
+                <span>Nube inactiva</span>
+            </div>
+            <div id="statusIndicator" class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-medium">
+                <i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i>
+                <span id="statusText">Descargando IA...</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Contenido Principal -->
+    <main class="flex-1 flex flex-col lg:flex-row overflow-hidden">
+        
+        <!-- ========================================== -->
+        <!-- PANEL IZQUIERDO: REGISTRO DE PERSONAS      -->
+        <!-- ========================================== -->
+        <section class="w-full lg:w-[340px] bg-slate-900 border-r border-slate-800 flex flex-col shrink-0">
+            <div class="p-5 border-b border-slate-800 bg-slate-900/50">
+                <h2 class="text-sm font-semibold uppercase tracking-wider text-slate-300 mb-4 flex items-center gap-2">
+                    <i data-lucide="user-plus" class="w-4 h-4 text-emerald-400"></i> Registrar Persona
+                </h2>
+                
+                <div class="space-y-3">
+                    <div>
+                        <label class="block text-xs text-slate-400 mb-1">Nombre Completo</label>
+                        <input type="text" id="newPersonName" placeholder="Ej. Juan Pérez" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2.5 text-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 focus:outline-none text-slate-200 placeholder-slate-600 transition">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-xs text-slate-400 mb-1">Categoría</label>
+                        <select id="newPersonRoleSelect" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2.5 text-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 focus:outline-none text-slate-200 transition mb-2">
+                            <option value="" disabled selected>Seleccione una categoría...</option>
+                            <option value="Alumno">Alumno</option>
+                            <option value="Docente o Educador(a)">Docente o Educador(a)</option>
+                            <option value="Administrativo">Administrativo</option>
+                            <option value="Visita">Visita</option>
+                            <option value="Apoderado">Apoderado</option>
+                            <option value="Otro">Otro (Especificar)</option>
+                        </select>
+                        
+                        <!-- Input para Curso (Oculto por defecto) -->
+                        <div id="courseContainer" class="hidden">
+                            <label class="block text-xs text-slate-400 mb-1">Curso</label>
+                            <input type="text" id="newPersonCourse" placeholder="Ej. 4to Medio A" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2.5 text-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 focus:outline-none text-slate-200 placeholder-slate-600 transition">
+                        </div>
+
+                        <!-- Input para Otro Cargo (Oculto por defecto) -->
+                        <div id="customRoleContainer" class="hidden">
+                            <label class="block text-xs text-slate-400 mb-1">Especificar Categoría</label>
+                            <input type="text" id="newPersonCustomRole" placeholder="Ej. Inspector" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2.5 text-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 focus:outline-none text-slate-200 placeholder-slate-600 transition">
+                        </div>
+                    </div>
+
+                    <button id="btnCapture" disabled class="w-full bg-emerald-600 hover:bg-emerald-500 disabled:bg-slate-800 disabled:text-slate-500 disabled:border-slate-700 border border-emerald-500 text-white py-2.5 mt-2 rounded-lg text-sm font-bold transition flex items-center justify-center gap-2 shadow-lg shadow-emerald-900/20">
+                        <i data-lucide="camera" class="w-4 h-4"></i> Capturar y Guardar
+                    </button>
+                    <p class="text-[10px] text-slate-500 leading-tight">
+                        La biometría se guardará para su reconocimiento automático en futuras sesiones.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Lista de Registrados (Base de Datos) -->
+            <div class="flex-1 overflow-hidden flex flex-col">
+                <div class="px-5 py-3 border-b border-slate-800 bg-slate-950 flex justify-between items-center">
+                    <h3 class="text-xs font-semibold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+                        <i data-lucide="database" class="w-3.5 h-3.5 text-cyan-500"></i> Base de Datos
+                    </h3>
+                    <span id="registeredCount" class="bg-slate-800 text-slate-300 text-[10px] px-2 py-0.5 rounded-full font-mono">0</span>
+                </div>
+                <div id="registeredList" class="flex-1 overflow-y-auto p-3 space-y-2 relative">
+                    <div class="text-center text-xs text-slate-500 py-6 italic" id="emptyDbMsg">
+                        Sincronizando datos...
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- ÁREA CENTRAL: CÁMARA DE CONTROL PRINCIPAL  -->
+        <!-- ========================================== -->
+        <section class="flex-1 bg-slate-950 flex flex-col overflow-hidden p-6 gap-4 relative justify-center items-center">
+            
+            <div class="w-full max-w-3xl flex justify-between items-end mb-2">
+                <div>
+                    <h2 class="text-xl font-black text-slate-200 flex items-center gap-2">
+                        <i data-lucide="cctv" class="w-6 h-6 text-cyan-400"></i> Escáner de Acceso
+                    </h2>
+                    <p class="text-xs text-slate-400 mt-1">El sistema identificará automáticamente a las personas en tu base de datos.</p>
+                </div>
+                
+                <div class="flex items-center gap-2 bg-slate-900 border border-slate-800 rounded-lg p-1.5">
+                    <button id="btnSwitchCam" class="p-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded transition" title="Cambiar Cámara">
+                        <i data-lucide="switch-camera" class="w-4 h-4"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Contenedor de Video Biomético -->
+            <div class="relative w-full max-w-3xl aspect-[4/3] rounded-2xl overflow-hidden shadow-2xl border border-slate-800 bg-black flex items-center justify-center group">
+                
+                <video id="webcam" class="absolute inset-0 w-full h-full object-cover" autoplay playsinline muted></video>
+                <canvas id="overlayCanvas" class="absolute inset-0 w-full h-full object-cover pointer-events-none z-10"></canvas>
+                
+                <!-- Efecto visual de escaneo -->
+                <div class="absolute inset-0 pointer-events-none border-[3px] border-transparent group-hover:border-cyan-500/30 transition-colors rounded-2xl z-20"></div>
+                
+                <div id="videoPlaceholder" class="absolute flex flex-col items-center justify-center text-slate-500 z-0">
+                    <i data-lucide="video-off" class="w-12 h-12 mb-3 opacity-50"></i>
+                    <span class="text-sm">Iniciando cámara...</span>
+                </div>
+            </div>
+
+            <div class="w-full max-w-3xl flex justify-between text-xs text-slate-500 mt-2">
+                <span>Distancia de Coincidencia (Umbral): <span class="font-mono text-cyan-400">0.50</span></span>
+                <span>Procesamiento 100% Local (Privacidad Segura)</span>
+            </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- PANEL DERECHO: REPORTE DE ASISTENCIA       -->
+        <!-- ========================================== -->
+        <section class="w-full lg:w-80 bg-slate-900 border-l border-slate-800 flex flex-col shrink-0">
+            
+            <div class="p-5 border-b border-slate-800 flex justify-between items-center bg-slate-900/50">
+                <h2 class="text-sm font-semibold uppercase tracking-wider text-slate-300 flex items-center gap-2">
+                    <i data-lucide="clipboard-list" class="w-4 h-4 text-cyan-400"></i> Registro del Día
+                </h2>
+                <button id="btnClearLog" class="text-xs text-slate-400 hover:text-rose-400 transition" title="Limpiar Registro">
+                    <i data-lucide="trash-2" class="w-4 h-4"></i>
+                </button>
+            </div>
+            
+            <!-- Lista de Asistencias (Log en tiempo real) -->
+            <div id="attendanceLog" class="flex-1 overflow-y-auto p-4 space-y-2">
+                <div class="text-center text-xs text-slate-500 py-8" id="emptyLogMsg">
+                    Nadie ha ingresado aún.
+                </div>
+            </div>
+
+            <!-- Resumen y Exportación -->
+            <div class="p-5 bg-slate-950 border-t border-slate-800">
+                <div class="flex justify-between items-center text-sm font-medium text-slate-300 mb-4 bg-slate-900 p-3 rounded-lg border border-slate-800">
+                    <span>Total Asistencias:</span>
+                    <span id="totalAttendance" class="font-bold text-cyan-400 font-mono text-lg">0</span>
+                </div>
+                
+                <button id="btnExport" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 py-2.5 rounded-lg text-sm font-semibold transition flex items-center justify-center gap-2 group">
+                    <i data-lucide="file-spreadsheet" class="w-4 h-4 text-emerald-400 group-hover:scale-110 transition-transform"></i> 
+                    Descargar Excel (CSV)
+                </button>
+            </div>
+        </section>
+    </main>
+
+    <!-- ========================================== -->
+    <!-- FIRMA DE AUTOR                             -->
+    <!-- ========================================== -->
+    <div class="fixed bottom-4 right-4 md:bottom-6 md:right-8 opacity-50 hover:opacity-100 transition-opacity duration-500 z-50 print:hidden pointer-events-none select-none">
+        <div class="flex flex-col items-end">
+            <span class="text-[0.65rem] text-gray-400 uppercase tracking-widest font-sans mb-[-4px]">Creada por</span>
+            <span class="text-2xl text-gray-200" style="font-family: 'Brush Script MT', 'Lucida Handwriting', 'Great Vibes', cursive;">Nasslo Muñoz</span>
+            <span class="text-[0.6rem] text-gray-400 font-sans tracking-widest uppercase mt-1">Ingeniero Informático</span>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- CONFIGURACIÓN Y LÓGICA PRINCIPAL JAVASCRIPT-->
+    <!-- ========================================== -->
+    <script type="module">
+        // ----------------------------------------------------------------------
+        // 1. IMPORTACIONES FIREBASE
+        // ----------------------------------------------------------------------
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInWithCustomToken, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, getDocs, doc, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // ----------------------------------------------------------------------
+        // 2. REFERENCIAS A ELEMENTOS DEL DOM
+        // ----------------------------------------------------------------------
+        // Cámara y Canvas
+        const video = document.getElementById('webcam');
+        const canvas = document.getElementById('overlayCanvas');
+        const videoPlaceholder = document.getElementById('videoPlaceholder');
+        const btnSwitchCam = document.getElementById('btnSwitchCam');
+        
+        // Indicadores de Estado
+        const statusIndicator = document.getElementById('statusIndicator');
+        const statusText = document.getElementById('statusText');
+        const cloudStatus = document.getElementById('cloudStatus');
+        const toastContainer = document.getElementById('toastContainer');
+        
+        // Formulario de Registro
+        const btnCapture = document.getElementById('btnCapture');
+        const newPersonName = document.getElementById('newPersonName');
+        const newPersonRoleSelect = document.getElementById('newPersonRoleSelect');
+        const courseContainer = document.getElementById('courseContainer');
+        const newPersonCourse = document.getElementById('newPersonCourse');
+        const customRoleContainer = document.getElementById('customRoleContainer');
+        const newPersonCustomRole = document.getElementById('newPersonCustomRole');
+        
+        // Base de Datos UI
+        const registeredList = document.getElementById('registeredList');
+        const registeredCount = document.getElementById('registeredCount');
+        const emptyDbMsg = document.getElementById('emptyDbMsg');
+        
+        // Reporte de Asistencia UI
+        const attendanceLogContainer = document.getElementById('attendanceLog');
+        const totalAttendanceDisplay = document.getElementById('totalAttendance');
+        const btnExport = document.getElementById('btnExport');
+        const btnClearLog = document.getElementById('btnClearLog');
+
+        // ----------------------------------------------------------------------
+        // 3. VARIABLES DE ESTADO GLOBAL
+        // ----------------------------------------------------------------------
+        // Hardware e IA
+        let isModelLoaded = false;
+        let currentStream = null;
+        let usingFrontCamera = true;
+        let displaySize = { width: 640, height: 480 };
+        
+        // Base de Datos Biométrica en Memoria
+        let registeredProfiles = []; 
+        let faceMatcher = null; 
+        const userRoles = {};
+        
+        // Datos de Asistencia y Prevención de Duplicados
+        let attendanceData = []; 
+        const lastSeen = {}; 
+        const COOLDOWN_MINUTES = 1; 
+        const COOLDOWN_MS = COOLDOWN_MINUTES * 60 * 1000;
+
+        // Firebase Auth y DB
+        let app, auth, db, currentUser, appId;
+        let isFirebaseActive = false;
+
+        // ----------------------------------------------------------------------
+        // 4. INICIALIZACIÓN Y CONFIGURACIÓN DE FIREBASE (NUBE)
+        // ----------------------------------------------------------------------
+        function initFirebase() {
+            try {
+                const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null;
+                appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+                
+                if (!firebaseConfig) {
+                    console.warn("Configuración de Firebase no encontrada. Ejecutando en modo local (sin nube).");
+                    setCloudStatus("Modo Local", "hard-drive", "text-slate-400", "bg-slate-800");
+                    updateRegisteredUI();
+                    return;
+                }
+
+                app = initializeApp(firebaseConfig);
+                auth = getAuth(app);
+                db = getFirestore(app);
+                isFirebaseActive = true;
+
+                authenticateFirebase();
+            } catch (error) {
+                console.error("Error inicializando Firebase:", error);
+                setCloudStatus("Error de Nube", "cloud-lightning", "text-rose-400", "bg-rose-900/30");
+                updateRegisteredUI();
+            }
+        }
+
+        async function authenticateFirebase() {
+            setCloudStatus("Conectando...", "refresh-cw", "text-amber-400", "bg-amber-900/30");
+            try {
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
+                
+                onAuthStateChanged(auth, async (user) => {
+                    currentUser = user;
+                    if (user) {
+                        setCloudStatus("Nube en línea", "cloud-check", "text-cyan-400", "bg-cyan-900/30");
+                        await loadProfilesFromCloud();
+                    } else {
+                        setCloudStatus("Desconectado", "cloud-off", "text-slate-400", "bg-slate-800");
+                    }
+                });
+            } catch (error) {
+                console.error("Error de autenticación:", error);
+                setCloudStatus("Fallo de Auth", "shield-alert", "text-rose-400", "bg-rose-900/30");
+            }
+        }
+
+        // ----------------------------------------------------------------------
+        // 5. OPERACIONES DE LECTURA/ESCRITURA EN FIRESTORE
+        // ----------------------------------------------------------------------
+        async function loadProfilesFromCloud() {
+            if (!currentUser || !isFirebaseActive) return;
+
+            try {
+                const profilesRef = collection(db, 'artifacts', appId, 'users', currentUser.uid, 'biometricProfiles');
+                const snapshot = await getDocs(profilesRef);
+                
+                // Reiniciar colecciones locales antes de poblar
+                registeredProfiles = [];
+                for (const key in userRoles) {
+                    delete userRoles[key]; 
+                }
+
+                snapshot.forEach(docSnap => {
+                    const data = docSnap.data();
+                    if (data.name && data.descriptor) {
+                        userRoles[data.name] = data.role || 'Sin asignar';
+                        const descriptorArray = new Float32Array(data.descriptor);
+                        registeredProfiles.push(new faceapi.LabeledFaceDescriptors(data.name, [descriptorArray]));
+                    }
+                });
+
+                if (registeredProfiles.length > 0) {
+                    faceMatcher = new faceapi.FaceMatcher(registeredProfiles, 0.50);
+                    showToast(`Se cargaron ${registeredProfiles.length} perfiles desde la nube.`, "info");
+                }
+                
+                updateRegisteredUI();
+            } catch (error) {
+                console.error("Error al cargar desde Firestore:", error);
+                showToast("No se pudieron descargar los perfiles.", "error");
+                updateRegisteredUI();
+            }
+        }
+
+        async function saveProfileToCloud(name, role, faceDescriptorRaw) {
+            if (!currentUser || !isFirebaseActive) {
+                showToast("Modo local: El perfil se guardó en memoria, pero se perderá al recargar la página.", "info");
+                return;
+            }
+
+            try {
+                const profilesRef = collection(db, 'artifacts', appId, 'users', currentUser.uid, 'biometricProfiles');
+                const plainArray = Array.from(faceDescriptorRaw);
+                
+                await setDoc(doc(profilesRef, name), {
+                    name: name,
+                    role: role,
+                    descriptor: plainArray,
+                    createdAt: new Date().toISOString()
+                });
+                
+                showToast("Perfil guardado de forma segura en la nube.", "success");
+            } catch (error) {
+                console.error("Error al guardar en Firestore:", error);
+                showToast("No se pudo guardar el perfil en la nube.", "error");
+            }
+        }
+
+        // ----------------------------------------------------------------------
+        // 6. UTILIDADES E INTERFAZ DE USUARIO
+        // ----------------------------------------------------------------------
+        function setCloudStatus(text, iconName, textColor, bgColor) {
+            cloudStatus.className = `flex items-center gap-2 px-3 py-1.5 rounded-full border border-slate-700/50 text-xs font-medium transition-colors ${textColor} ${bgColor}`;
+            cloudStatus.innerHTML = `<i data-lucide="${iconName}" class="w-4 h-4 ${iconName === 'refresh-cw' ? 'animate-spin' : ''}"></i><span>${text}</span>`;
+            lucide.createIcons();
+        }
+
+        function showToast(message, type = 'success') {
+            const toast = document.createElement('div');
+            let icon = 'check-circle';
+            let colors = 'bg-emerald-950/90 border-emerald-500/50 text-emerald-100';
+            let iconColor = 'text-emerald-400';
+            
+            if (type === 'error') {
+                icon = 'alert-circle';
+                colors = 'bg-rose-950/90 border-rose-500/50 text-rose-100';
+                iconColor = 'text-rose-400';
+            } else if (type === 'info') {
+                icon = 'info';
+                colors = 'bg-cyan-950/90 border-cyan-500/50 text-cyan-100';
+                iconColor = 'text-cyan-400';
+            }
+
+            toast.className = `toast-enter flex items-start gap-3 p-4 rounded-xl border shadow-xl backdrop-blur-md pointer-events-auto ${colors}`;
+            toast.innerHTML = `
+                <i data-lucide="${icon}" class="w-5 h-5 ${iconColor} shrink-0 mt-0.5"></i>
+                <div class="text-sm font-medium leading-tight">${message}</div>
+                <button class="ml-auto text-slate-400 hover:text-white">
+                    <i data-lucide="x" class="w-4 h-4"></i>
+                </button>
+            `;
+            
+            toast.querySelector('button').addEventListener('click', () => toast.remove());
+            toastContainer.appendChild(toast);
+            lucide.createIcons();
+
+            // Desaparición automática
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateX(100%)';
+                toast.style.transition = 'all 0.3s ease';
+                setTimeout(() => toast.remove(), 300);
+            }, 4000);
+        }
+
+        // ----------------------------------------------------------------------
+        // 7. GESTIÓN DE LA CÁMARA E INTELIGENCIA ARTIFICIAL (FACE-API)
+        // ----------------------------------------------------------------------
+        async function startCamera() {
+            if (currentStream) {
+                currentStream.getTracks().forEach(track => track.stop());
+            }
+
+            const constraints = {
+                video: { 
+                    facingMode: usingFrontCamera ? 'user' : 'environment',
+                    width: { ideal: 640 },
+                    height: { ideal: 480 }
+                }
+            };
+
+            try {
+                currentStream = await navigator.mediaDevices.getUserMedia(constraints);
+                video.srcObject = currentStream;
+                videoPlaceholder.style.display = 'none';
+                
+                video.addEventListener('loadedmetadata', () => {
+                    displaySize = { width: video.videoWidth, height: video.videoHeight };
+                    faceapi.matchDimensions(canvas, displaySize);
+                });
+            } catch (err) {
+                console.error("Error de cámara:", err);
+                showToast("No se pudo acceder a la cámara. Verifica los permisos.", "error");
+            }
+        }
+
+        btnSwitchCam.addEventListener('click', () => {
+            usingFrontCamera = !usingFrontCamera;
+            startCamera();
+        });
+
+        async function loadModels() {
+            const MODEL_URL = 'https://vladmandic.github.io/face-api/model/';
+            
+            try {
+                // Descarga de modelos neuronales
+                await faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL);
+                await faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL);
+                await faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL);
+                
+                isModelLoaded = true;
+                btnCapture.disabled = false;
+                
+                statusIndicator.className = "flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-medium";
+                statusIndicator.innerHTML = `
+                    <i data-lucide="check-circle-2" class="w-4 h-4"></i>
+                    <span>IA Biométrica Activa</span>
+                `;
+                lucide.createIcons();
+                
+                // Iniciar el ciclo infinito de escaneo
+                recognizeFacesLoop();
+            } catch (err) {
+                console.error("Error cargando modelos:", err);
+                statusIndicator.className = "flex items-center gap-2 px-3 py-1.5 rounded-full bg-rose-500/10 border border-rose-500/30 text-rose-400 text-xs font-medium";
+                statusText.innerText = "Error cargando IA de reconocimiento.";
+                showToast("Hubo un problema al descargar los modelos de red neuronal.", "error");
+            }
+        }
+
+        // ----------------------------------------------------------------------
+        // 8. LÓGICA DE REGISTRO DE PERSONAS (NUEVOS USUARIOS)
+        // ----------------------------------------------------------------------
+        
+        // Manejo del selector desplegable dinámico
+        newPersonRoleSelect.addEventListener('change', (e) => {
+            const val = e.target.value;
+            courseContainer.classList.toggle('hidden', val !== 'Alumno');
+            customRoleContainer.classList.toggle('hidden', val !== 'Otro');
+        });
+
+        btnCapture.addEventListener('click', async () => {
+            const name = newPersonName.value.trim();
+            const roleSelection = newPersonRoleSelect.value;
+            let finalRole = "";
+
+            // Validaciones básicas
+            if (!name || !roleSelection) {
+                showToast("Por favor, ingresa el nombre y selecciona una categoría.", "error");
+                if (!name) newPersonName.focus();
+                else newPersonRoleSelect.focus();
+                return;
+            }
+
+            // Validaciones dinámicas según la categoría
+            if (roleSelection === 'Alumno') {
+                const course = newPersonCourse.value.trim();
+                if (!course) {
+                    showToast("Por favor, ingresa el curso del alumno.", "error");
+                    newPersonCourse.focus();
+                    return;
+                }
+                finalRole = `Alumno - ${course}`;
+            } else if (roleSelection === 'Otro') {
+                const custom = newPersonCustomRole.value.trim();
+                if (!custom) {
+                    showToast("Por favor, especifica la categoría.", "error");
+                    newPersonCustomRole.focus();
+                    return;
+                }
+                finalRole = custom;
+            } else {
+                finalRole = roleSelection;
+            }
+
+            // Feedback visual mientras procesa
+            const originalBtnHtml = btnCapture.innerHTML;
+            btnCapture.disabled = true;
+            btnCapture.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Analizando rostro...`;
+            lucide.createIcons();
+
+            try {
+                // Captura del rostro
+                const detection = await faceapi.detectSingleFace(video, new faceapi.TinyFaceDetectorOptions())
+                                               .withFaceLandmarks()
+                                               .withFaceDescriptor();
+
+                if (!detection) {
+                    showToast("No se detectó ningún rostro claro. Mira a la cámara.", "error");
+                } else {
+                    userRoles[name] = finalRole;
+
+                    const faceDescriptor = [detection.descriptor];
+                    const existingIndex = registeredProfiles.findIndex(p => p.label === name);
+                    
+                    // Actualizar si existe, o crear nuevo perfil
+                    if (existingIndex !== -1) {
+                        registeredProfiles[existingIndex] = new faceapi.LabeledFaceDescriptors(name, faceDescriptor);
+                    } else {
+                        registeredProfiles.push(new faceapi.LabeledFaceDescriptors(name, faceDescriptor));
+                    }
+                    
+                    // Re-entrenar el motor de comparación en memoria
+                    faceMatcher = new faceapi.FaceMatcher(registeredProfiles, 0.50);
+                    
+                    // Guardar en Firebase
+                    await saveProfileToCloud(name, finalRole, detection.descriptor);
+
+                    showToast(`¡${name} registrado exitosamente!`);
+                    
+                    // Limpiar formulario completo
+                    newPersonName.value = '';
+                    newPersonRoleSelect.value = '';
+                    newPersonCourse.value = '';
+                    newPersonCustomRole.value = '';
+                    courseContainer.classList.add('hidden');
+                    customRoleContainer.classList.add('hidden');
+                    
+                    updateRegisteredUI();
+                }
+            } catch (err) {
+                console.error("Error en registro:", err);
+                showToast("Ocurrió un error al procesar la imagen.", "error");
+            } finally {
+                // Restaurar botón
+                btnCapture.disabled = false;
+                btnCapture.innerHTML = originalBtnHtml;
+                lucide.createIcons();
+            }
+        });
+
+        function updateRegisteredUI() {
+            registeredCount.innerText = registeredProfiles.length;
+            
+            if (registeredProfiles.length === 0) {
+                emptyDbMsg.style.display = 'block';
+                emptyDbMsg.innerHTML = "No hay personas registradas.<br>Usa el formulario para comenzar.";
+                registeredList.innerHTML = '';
+                registeredList.appendChild(emptyDbMsg);
+                return;
+            } else {
+                emptyDbMsg.style.display = 'none';
+            }
+            
+            // Limpiar la lista manteniendo el mensaje de vacío (si estuviera)
+            Array.from(registeredList.children).forEach(child => {
+                if (child.id !== 'emptyDbMsg') child.remove();
+            });
+
+            // Re-renderizar la lista de usuarios
+            registeredProfiles.forEach(profile => {
+                const role = userRoles[profile.label] || 'Sin asignar';
+                const div = document.createElement('div');
+                div.className = "flex items-start gap-3 bg-slate-900 border border-slate-800 p-2.5 rounded-lg text-sm text-slate-300";
+                div.innerHTML = `
+                    <div class="bg-cyan-500/20 text-cyan-400 p-1.5 rounded-md mt-0.5">
+                        <i data-lucide="user" class="w-4 h-4"></i>
+                    </div>
+                    <div>
+                        <div class="font-bold">${profile.label}</div>
+                        <div class="text-[10px] text-slate-400 uppercase tracking-wide">${role}</div>
+                    </div>
+                `;
+                registeredList.appendChild(div);
+            });
+            lucide.createIcons();
+        }
+
+        // ----------------------------------------------------------------------
+        // 9. BUCLE PRINCIPAL DE RECONOCIMIENTO FACIAL EN TIEMPO REAL
+        // ----------------------------------------------------------------------
+        async function recognizeFacesLoop() {
+            if (!video.paused && !video.ended && isModelLoaded) {
+                
+                const detections = await faceapi.detectAllFaces(video, new faceapi.TinyFaceDetectorOptions())
+                                                .withFaceLandmarks()
+                                                .withFaceDescriptors();
+                
+                const resizedDetections = faceapi.resizeResults(detections, displaySize);
+                const ctx = canvas.getContext('2d');
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                resizedDetections.forEach(detection => {
+                    const box = detection.detection.box;
+                    let label = "Desconocido";
+                    let roleDisplay = "";
+                    let color = "#ef4444"; // Rojo (No identificado)
+                    
+                    if (faceMatcher) {
+                        const bestMatch = faceMatcher.findBestMatch(detection.descriptor);
+                        if (bestMatch.label !== 'unknown') {
+                            label = bestMatch.label;
+                            roleDisplay = userRoles[label] || '';
+                            color = "#10b981"; // Verde (Identificado)
+                            logAttendance(label);
+                        } else {
+                            label = `Desconocido (${bestMatch.distance.toFixed(2)})`;
+                        }
+                    }
+
+                    // Dibujar el recuadro alrededor del rostro
+                    ctx.strokeStyle = color;
+                    ctx.lineWidth = 3;
+                    ctx.strokeRect(box.x, box.y, box.width, box.height);
+
+                    // Dibujar fondo de la etiqueta de texto
+                    ctx.fillStyle = color;
+                    const textWidth = ctx.measureText(label).width;
+                    const boxHeight = roleDisplay ? 40 : 25;
+                    ctx.fillRect(box.x - 1.5, box.y - boxHeight, Math.max(textWidth, 120) + 15, boxHeight);
+
+                    // Dibujar nombre
+                    ctx.fillStyle = "#ffffff";
+                    ctx.font = "bold 14px Arial";
+                    ctx.fillText(label, box.x + 5, box.y - (roleDisplay ? 22 : 7));
+                    
+                    // Dibujar cargo (si existe)
+                    if (roleDisplay) {
+                        ctx.fillStyle = "rgba(255, 255, 255, 0.8)";
+                        ctx.font = "11px Arial";
+                        ctx.fillText(roleDisplay, box.x + 5, box.y - 7);
+                    }
+                });
+            }
+            // Solicitar el siguiente frame recursivamente
+            requestAnimationFrame(recognizeFacesLoop);
+        }
+
+        // ----------------------------------------------------------------------
+        // 10. SISTEMA DE REGISTRO DE ASISTENCIA Y REPORTES
+        // ----------------------------------------------------------------------
+        function logAttendance(name) {
+            const now = Date.now();
+            
+            // Verificación del tiempo de gracia (cooldown)
+            if (lastSeen[name] && (now - lastSeen[name] < COOLDOWN_MS)) {
+                return; 
+            }
+            
+            lastSeen[name] = now;
+            const role = userRoles[name] || 'Sin asignar';
+            const timeStr = new Date().toLocaleTimeString();
+            
+            // Guardar en el array de reporte
+            attendanceData.push({
+                name: name,
+                role: role,
+                time: timeStr,
+                timestamp: now
+            });
+            
+            updateAttendanceUI(name, role, timeStr);
+            
+            // Emitir un ligero pitido de confirmación
+            try {
+                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = audioCtx.createOscillator();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(800, audioCtx.currentTime);
+                osc.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.1);
+            } catch(e) {
+                // Silenciar si el navegador bloquea el audio automático
+            }
+        }
+
+        function updateAttendanceUI(name, role, time) {
+            totalAttendanceDisplay.innerText = attendanceData.length;
+            const emptyLog = document.getElementById('emptyLogMsg');
+            if (emptyLog) emptyLog.style.display = 'none';
+
+            const div = document.createElement('div');
+            div.className = "flex justify-between items-center bg-emerald-950/20 border border-emerald-900/30 p-3 rounded-lg animate-fadeIn";
+            div.innerHTML = `
+                <div class="flex items-center gap-3">
+                    <div class="bg-emerald-500/20 text-emerald-400 p-1.5 rounded-full">
+                        <i data-lucide="user-check" class="w-4 h-4"></i>
+                    </div>
+                    <div>
+                        <div class="text-sm font-bold text-slate-200">${name}</div>
+                        <div class="text-[10px] text-emerald-500 font-semibold uppercase tracking-wide">${role}</div>
+                    </div>
+                </div>
+                <div class="text-xs text-slate-400 font-mono bg-slate-900 px-2 py-1 rounded">${time}</div>
+            `;
+            
+            // Insertar la nueva asistencia al principio de la lista
+            attendanceLogContainer.prepend(div);
+            lucide.createIcons();
+        }
+
+        btnClearLog.addEventListener('click', () => {
+            if (confirm("¿Estás seguro de limpiar el registro de asistencia actual?")) {
+                attendanceData = [];
+                attendanceLogContainer.innerHTML = `<div class="text-center text-xs text-slate-500 py-8" id="emptyLogMsg">Nadie ha ingresado aún.</div>`;
+                totalAttendanceDisplay.innerText = "0";
+                
+                // Limpiar tiempos de gracia
+                for (let key in lastSeen) {
+                    delete lastSeen[key]; 
+                }
+            }
+        });
+
+        btnExport.addEventListener('click', () => {
+            if (attendanceData.length === 0) {
+                showToast("No hay datos de asistencia para exportar.", "info");
+                return;
+            }
+
+            // BOM y "sep=;" para correcta interpretación en MS Excel (UTF-8 y delimitador de celdas)
+            const BOM = "\uFEFF";
+            let csvContent = BOM + "sep=;\nNombre;Cargo o Curso;Fecha;Hora\n";
+            const dateStr = new Date().toLocaleDateString();
+
+            attendanceData.forEach(record => {
+                csvContent += `"${record.name}";"${record.role}";"${dateStr}";"${record.time}"\n`;
+            });
+
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            
+            const link = document.createElement("a");
+            link.setAttribute("href", url);
+            const fileNameDate = new Date().toISOString().split('T')[0];
+            link.setAttribute("download", `Reporte_Asistencia_${fileNameDate}.csv`);
+            
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            showToast("Reporte exportado exitosamente.", "success");
+        });
+
+        // ----------------------------------------------------------------------
+        // 11. FUNCIÓN DE INICIO / ARRANQUE
+        // ----------------------------------------------------------------------
+        async function init() {
+            lucide.createIcons();
+            
+            // 1. Inicializar conexión a base de datos
+            initFirebase();
+            
+            // 2. Encender cámara web
+            await startCamera();
+            
+            // 3. Cargar modelos de Inteligencia Artificial (Descarga asíncrona)
+            await loadModels();
+        }
+
+        // Ejecutar cuando el HTML haya cargado completamente
+        window.onload = init;
+    </script>
+</body>
+</html>
