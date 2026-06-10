@@ -126,78 +126,66 @@
             </div>
         </section>
 
-        <!-- ========================================================= -->
-        <!-- ÁREA CENTRAL: PANTALLA PARTIDA EN DOS (CONSOLA DE CÁMARAS)-->
-        <!-- ========================================================= -->
-        <section class="flex-1 bg-slate-950 flex flex-col overflow-y-auto lg:overflow-hidden p-4 md:p-6 gap-6 justify-center items-center">
+        <!-- ========================================================================= -->
+        <!-- ÁREA CENTRAL: PANEL DE ESCÁNER GIGANTE CON MINI REGISTRO FLOTANTE (PiP)   -->
+        <!-- ========================================================================= -->
+        <section class="flex-1 bg-slate-950 flex flex-col p-4 md:p-6 justify-center items-center overflow-hidden">
             
-            <div class="w-full grid grid-cols-1 md:grid-cols-2 gap-6 h-full max-w-5xl">
+            <!-- CONTENEDOR BASE GIGANTE (Muestra el Escáner de Acceso) -->
+            <div class="relative w-full h-full max-w-4xl aspect-[4/3] bg-black rounded-3xl overflow-hidden shadow-2xl border border-slate-800/80 flex items-center justify-center group">
                 
-                <!-- CÁMARA 1: ENROLAMIENTO / REGISTRO -->
-                <div class="bg-slate-900/40 border border-slate-800/80 rounded-2xl p-4 flex flex-col gap-3 shadow-xl backdrop-blur-sm">
-                    <div class="flex flex-wrap justify-between items-center gap-2 shrink-0">
-                        <div class="flex items-center gap-2">
-                            <span class="w-2.5 h-2.5 rounded-full bg-cyan-400 animate-ping"></span>
-                            <h3 class="text-sm font-bold text-slate-200 flex items-center gap-1.5">
-                                <i data-lucide="scan" class="w-4 h-4 text-cyan-400"></i> Cámara 1: Registro (PC)
-                            </h3>
+                <!-- Video y Canvas del Escáner (Cámara 2) ocupando todo el fondo -->
+                <video id="webcamScan" class="absolute inset-0 w-full h-full object-cover" autoplay playsinline muted></video>
+                <canvas id="overlayCanvasScan" class="absolute inset-0 w-full h-full object-cover pointer-events-none z-10"></canvas>
+                
+                <!-- Efecto HUD para el Escáner -->
+                <div class="absolute inset-0 pointer-events-none border-[3px] border-transparent group-hover:border-emerald-500/20 transition-colors rounded-3xl z-20"></div>
+                
+                <div id="videoPlaceholderScan" class="absolute flex flex-col items-center justify-center text-slate-500 z-0">
+                    <i data-lucide="video-off" class="w-10 h-10 mb-2 opacity-50 animate-pulse"></i>
+                    <span class="text-xs">Iniciando dispositivo de acceso...</span>
+                </div>
+
+                <!-- Cabecera flotante para Cámara 2 (Escáner) -->
+                <div class="absolute top-4 right-4 bg-slate-900/90 backdrop-blur-md border border-slate-800/80 px-3 py-1.5 rounded-xl z-20 flex items-center gap-3 shadow-lg">
+                    <div class="flex items-center gap-1.5">
+                        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+                        <span class="text-xs font-bold text-slate-200 uppercase tracking-wider">Cámara 2: Escáner</span>
+                    </div>
+                    <select id="cameraScanSelect" class="bg-slate-950 border border-slate-800 rounded-lg px-2 py-1 text-[11px] text-slate-300 focus:outline-none focus:ring-1 focus:ring-emerald-500 max-w-[150px]">
+                        <option value="">Cargando...</option>
+                    </select>
+                </div>
+
+                <!-- ========================================== -->
+                <!-- MINI VENTANA FLOTANTE: CÁMARA 1 (REGISTRO)  -->
+                <!-- ========================================== -->
+                <div class="absolute top-4 left-4 w-44 sm:w-56 bg-slate-900/95 backdrop-blur-md border border-slate-700/60 rounded-2xl p-2.5 shadow-2xl z-30 flex flex-col gap-2 transition-all hover:scale-[1.02]">
+                    <div class="flex items-center justify-between gap-1">
+                        <div class="flex items-center gap-1 shrink-0">
+                            <span class="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse"></span>
+                            <span class="text-[10px] font-bold text-slate-300 uppercase tracking-wide">Cámara 1: Registro</span>
                         </div>
-                        
-                        <!-- Selector de dispositivo Cámara 1 -->
-                        <select id="cameraRegSelect" class="bg-slate-950 border border-slate-700 rounded-lg px-2 py-1 text-xs text-slate-300 focus:outline-none focus:ring-1 focus:ring-cyan-500 max-w-[180px]">
-                            <option value="">Cargando cámaras...</option>
+                        <select id="cameraRegSelect" class="bg-slate-950 border border-slate-800 rounded-lg px-1.5 py-0.5 text-[10px] text-slate-300 focus:outline-none focus:ring-1 focus:ring-cyan-500 max-w-[90px] sm:max-w-[110px]">
+                            <option value="">Cargando...</option>
                         </select>
                     </div>
 
-                    <!-- Contenedor del video de Enrolamiento -->
-                    <div class="relative w-full aspect-[4/3] bg-black rounded-xl overflow-hidden border border-slate-800 flex items-center justify-center">
+                    <!-- Mini video de Enrolamiento -->
+                    <div class="relative w-full aspect-[4/3] bg-black rounded-lg overflow-hidden border border-slate-800/80 flex items-center justify-center">
                         <video id="webcamReg" class="absolute inset-0 w-full h-full object-cover" autoplay playsinline muted></video>
                         <canvas id="overlayCanvasReg" class="absolute inset-0 w-full h-full object-cover pointer-events-none z-10"></canvas>
                         
-                        <div id="videoPlaceholderReg" class="absolute flex flex-col items-center justify-center text-slate-500">
-                            <i data-lucide="video-off" class="w-10 h-12 mb-2 opacity-50"></i>
-                            <span class="text-xs">Iniciando dispositivo de registro...</span>
+                        <div id="videoPlaceholderReg" class="absolute flex flex-col items-center justify-center text-slate-600 z-0 text-center p-1">
+                            <i data-lucide="video-off" class="w-5 h-5 mb-1 opacity-50"></i>
+                            <span class="text-[8px]">Iniciando...</span>
                         </div>
-                    </div>
-                    <div class="text-[10px] text-slate-500 text-center">
-                        Muestra la cara de frente en el visor de arriba. Se proyectará un recuadro de alineación cian.
-                    </div>
-                </div>
-
-                <!-- CÁMARA 2: ESCÁNER / ACCESO EN VIVO -->
-                <div class="bg-slate-900/40 border border-slate-800/80 rounded-2xl p-4 flex flex-col gap-3 shadow-xl backdrop-blur-sm">
-                    <div class="flex flex-wrap justify-between items-center gap-2 shrink-0">
-                        <div class="flex items-center gap-2">
-                            <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping"></span>
-                            <h3 class="text-sm font-bold text-slate-200 flex items-center gap-1.5">
-                                <i data-lucide="cctv" class="w-4 h-4 text-emerald-400"></i> Cámara 2: Escáner (Acceso)
-                            </h3>
-                        </div>
-                        
-                        <!-- Selector de dispositivo Cámara 2 -->
-                        <select id="cameraScanSelect" class="bg-slate-950 border border-slate-700 rounded-lg px-2 py-1 text-xs text-slate-300 focus:outline-none focus:ring-1 focus:ring-emerald-500 max-w-[180px]">
-                            <option value="">Cargando cámaras...</option>
-                        </select>
-                    </div>
-
-                    <!-- Contenedor del video de Escaneo -->
-                    <div class="relative w-full aspect-[4/3] bg-black rounded-xl overflow-hidden border border-slate-800 flex items-center justify-center">
-                        <video id="webcamScan" class="absolute inset-0 w-full h-full object-cover" autoplay playsinline muted></video>
-                        <canvas id="overlayCanvasScan" class="absolute inset-0 w-full h-full object-cover pointer-events-none z-10"></canvas>
-                        
-                        <div id="videoPlaceholderScan" class="absolute flex flex-col items-center justify-center text-slate-500">
-                            <i data-lucide="video-off" class="w-10 h-12 mb-2 opacity-50"></i>
-                            <span class="text-xs">Iniciando dispositivo de acceso...</span>
-                        </div>
-                    </div>
-                    <div class="text-[10px] text-slate-500 text-center">
-                        Reconocimiento continuo. Al identificar un rostro se registrará su asistencia en el acto.
                     </div>
                 </div>
 
             </div>
 
-            <div class="w-full max-w-5xl flex justify-between text-[11px] text-slate-500 px-2 shrink-0">
+            <div class="w-full max-w-4xl flex justify-between text-[11px] text-slate-500 px-2 mt-3 shrink-0">
                 <span>Precisión biométrica calibrada al: <span class="font-mono text-cyan-400">50% (Dist: 0.50)</span></span>
                 <span>Procesamiento descentralizado local simultáneo</span>
             </div>
@@ -497,8 +485,8 @@
                     videoReg.srcObject = streamReg;
                     videoScan.srcObject = streamScan;
 
-                    videoPlaceholderReg.style.display = 'none';
-                    videoPlaceholderScan.style.display = 'none';
+                    if(videoPlaceholderReg) videoPlaceholderReg.style.display = 'none';
+                    if(videoPlaceholderScan) videoPlaceholderScan.style.display = 'none';
 
                 } else {
                     // CASO 2: Diferentes cámaras seleccionadas (Caminos independientes de captura física)
@@ -508,7 +496,7 @@
                     };
                     streamReg = await navigator.mediaDevices.getUserMedia(constraintsReg);
                     videoReg.srcObject = streamReg;
-                    videoPlaceholderReg.style.display = 'none';
+                    if(videoPlaceholderReg) videoPlaceholderReg.style.display = 'none';
 
                     // Configuración de Cámara 2 (Escáner)
                     const constraintsScan = {
@@ -516,7 +504,7 @@
                     };
                     streamScan = await navigator.mediaDevices.getUserMedia(constraintsScan);
                     videoScan.srcObject = streamScan;
-                    videoPlaceholderScan.style.display = 'none';
+                    if(videoPlaceholderScan) videoPlaceholderScan.style.display = 'none';
                 }
 
                 // Configurar detectores de metadatos para alineación de canvas
@@ -911,43 +899,6 @@
             
             showToast("Planilla Excel exportada exitosamente.", "success");
         });
-
-        function showToast(message, type = 'success') {
-            const toast = document.createElement('div');
-            let icon = 'check-circle';
-            let colors = 'bg-emerald-950/90 border-emerald-500/50 text-emerald-100';
-            let iconColor = 'text-emerald-400';
-            
-            if (type === 'error') {
-                icon = 'alert-circle';
-                colors = 'bg-rose-950/90 border-rose-500/50 text-rose-100';
-                iconColor = 'text-rose-400';
-            } else if (type === 'info') {
-                icon = 'info';
-                colors = 'bg-cyan-950/90 border-cyan-500/50 text-cyan-100';
-                iconColor = 'text-cyan-400';
-            }
-
-            toast.className = `toast-enter flex items-start gap-3 p-4 rounded-xl border shadow-xl backdrop-blur-md pointer-events-auto ${colors}`;
-            toast.innerHTML = `
-                <i data-lucide="${icon}" class="w-5 h-5 ${iconColor} shrink-0 mt-0.5"></i>
-                <div class="text-sm font-medium leading-tight">${message}</div>
-                <button class="ml-auto text-slate-400 hover:text-white">
-                    <i data-lucide="x" class="w-4 h-4"></i>
-                </button>
-            `;
-            
-            toast.querySelector('button').addEventListener('click', () => toast.remove());
-            toastContainer.appendChild(toast);
-            lucide.createIcons();
-
-            setTimeout(() => {
-                toast.style.opacity = '0';
-                toast.style.transform = 'translateX(100%)';
-                toast.style.transition = 'all 0.3s ease';
-                setTimeout(() => toast.remove(), 300);
-            }, 3500);
-        }
 
         // ----------------------------------------------------------------------
         // 11. INICIO Y ARRANQUE GENERAL DEL SISTEMA
