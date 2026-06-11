@@ -355,6 +355,69 @@
         let isFirebaseActive = false;
 
         // ----------------------------------------------------------------------
+        // 3.5 UTILIDAD DE CONFIGURACIÓN DE COLORES POR CATEGORÍA
+        // ----------------------------------------------------------------------
+        function getCategoryDetails(role) {
+            const r = (role || '').toLowerCase();
+            
+            if (r.includes('alumno')) {
+                return {
+                    name: 'Alumno',
+                    bg: 'bg-cyan-500/10 border-cyan-500/20 text-cyan-400',
+                    badge: 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/30',
+                    lineAccent: 'bg-cyan-500',
+                    hexBg: '#e0f2fe',  // Fondo Azul Celeste pastel para Excel
+                    hexText: '#0369a1' // Texto azul oscuro para Excel
+                };
+            } else if (r.includes('docente') || r.includes('educador')) {
+                return {
+                    name: 'Docente',
+                    bg: 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400',
+                    badge: 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30',
+                    lineAccent: 'bg-emerald-500',
+                    hexBg: '#d1fae5',  // Fondo Verde pastel para Excel
+                    hexText: '#047857' // Texto verde oscuro
+                };
+            } else if (r.includes('administrativo')) {
+                return {
+                    name: 'Administrativo',
+                    bg: 'bg-indigo-500/10 border-indigo-500/20 text-indigo-400',
+                    badge: 'bg-indigo-500/20 text-indigo-400 border border-indigo-500/30',
+                    lineAccent: 'bg-indigo-500',
+                    hexBg: '#e0e7ff',  // Fondo Indigo pastel para Excel
+                    hexText: '#4338ca' // Texto índigo oscuro
+                };
+            } else if (r.includes('visita')) {
+                return {
+                    name: 'Visita',
+                    bg: 'bg-amber-500/10 border-amber-500/20 text-amber-400',
+                    badge: 'bg-amber-500/20 text-amber-400 border border-amber-500/30',
+                    lineAccent: 'bg-amber-500',
+                    hexBg: '#fef3c7',  // Fondo Amarillo pastel para Excel
+                    hexText: '#b45309' // Texto ocre/naranja oscuro
+                };
+            } else if (r.includes('apoderado')) {
+                return {
+                    name: 'Apoderado',
+                    bg: 'bg-purple-500/10 border-purple-500/20 text-purple-400',
+                    badge: 'bg-purple-500/20 text-purple-400 border border-purple-500/30',
+                    lineAccent: 'bg-purple-500',
+                    hexBg: '#f3e8ff',  // Fondo Violeta pastel para Excel
+                    hexText: '#6d28d9' // Texto púrpura oscuro
+                };
+            } else {
+                return {
+                    name: 'Otro',
+                    bg: 'bg-slate-500/10 border-slate-500/20 text-slate-400',
+                    badge: 'bg-slate-500/20 text-slate-400 border border-slate-500/30',
+                    lineAccent: 'bg-slate-500',
+                    hexBg: '#f1f5f9',  // Fondo Gris pastel para Excel
+                    hexText: '#475569' // Texto gris oscuro
+                };
+            }
+        }
+
+        // ----------------------------------------------------------------------
         // 4. INICIALIZACIÓN Y CONFIGURACIÓN DE FIREBASE (NUBE)
         // ----------------------------------------------------------------------
         function initFirebase() {
@@ -822,16 +885,19 @@
 
             registeredProfiles.forEach(profile => {
                 const role = userRoles[profile.label] || 'Sin asignar';
+                const cat = getCategoryDetails(role);
                 const div = document.createElement('div');
                 div.className = "flex items-start justify-between bg-slate-900 border border-slate-800 p-2.5 rounded-lg text-sm text-slate-300";
                 div.innerHTML = `
-                    <div class="flex items-start gap-2.5">
-                        <div class="bg-cyan-500/20 text-cyan-400 p-1.5 rounded-md mt-0.5">
+                    <div class="flex items-start gap-2.5 w-full">
+                        <div class="${cat.bg} p-1.5 rounded-md mt-0.5 border">
                             <i data-lucide="user" class="w-4 h-4"></i>
                         </div>
-                        <div>
-                            <div class="font-bold text-slate-200">${profile.label}</div>
-                            <div class="text-[10px] text-slate-400 uppercase tracking-wide">${role}</div>
+                        <div class="flex-1 min-w-0">
+                            <div class="font-bold text-slate-200 truncate">${profile.label}</div>
+                            <div class="text-[9px] uppercase tracking-wide px-2 py-0.5 rounded ${cat.badge} font-bold inline-block mt-1 truncate max-w-full">
+                                ${role}
+                            </div>
                         </div>
                     </div>
                 `;
@@ -893,19 +959,25 @@
             const emptyLog = document.getElementById('emptyLogMsg');
             if (emptyLog) emptyLog.style.display = 'none';
 
+            const cat = getCategoryDetails(role);
             const div = document.createElement('div');
-            div.className = "flex justify-between items-center bg-emerald-950/20 border border-emerald-900/30 p-3 rounded-lg animate-fadeIn shadow-md";
+            
+            // Estructura moderna con un borde lateral acentuado del color de la categoría correspondiente
+            div.className = "flex justify-between items-center bg-slate-900/60 border border-slate-800 p-3 rounded-lg animate-fadeIn shadow-md relative overflow-hidden";
             div.innerHTML = `
-                <div class="flex items-center gap-3">
-                    <div class="bg-emerald-500/20 text-emerald-400 p-1.5 rounded-full">
+                <div class="absolute left-0 top-0 bottom-0 w-1 ${cat.lineAccent}"></div>
+                <div class="flex items-center gap-3 pl-1.5">
+                    <div class="${cat.bg} p-1.5 rounded-full border">
                         <i data-lucide="user-check" class="w-4 h-4"></i>
                     </div>
                     <div>
                         <div class="text-sm font-bold text-slate-200">${name}</div>
-                        <div class="text-[10px] text-emerald-500 font-semibold uppercase tracking-wide">${role}</div>
+                        <div class="text-[9px] font-bold uppercase tracking-wide px-2 py-0.5 rounded ${cat.badge} inline-block mt-1">
+                            ${role}
+                        </div>
                     </div>
                 </div>
-                <div class="text-xs text-slate-400 font-mono bg-slate-900 border border-slate-800 px-2 py-1 rounded">${time}</div>
+                <div class="text-xs text-slate-400 font-mono bg-slate-950 border border-slate-800 px-2 py-1 rounded shrink-0">${time}</div>
             `;
             
             attendanceLogContainer.prepend(div);
@@ -961,27 +1033,85 @@
                 return;
             }
 
-            const BOM = "\uFEFF";
-            let csvContent = BOM + "sep=;\nNombre;Cargo o Curso;Fecha;Hora\n";
             const dateStr = new Date().toLocaleDateString();
+            
+            // Construimos un documento XML / HTML compatible con Microsoft Excel que sí permite aplicar colores a celdas
+            let excelHtml = `
+            <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
+            <head>
+                <meta charset="utf-8">
+                <!--[if gte mso 9]>
+                <xml>
+                    <x:ExcelWorkbook>
+                        <x:ExcelWorksheets>
+                            <x:ExcelWorksheet>
+                                <x:Name>Control de Asistencia</x:Name>
+                                <x:WorksheetOptions>
+                                    <x:DisplayGridlines/>
+                                </x:WorksheetOptions>
+                            </x:ExcelWorksheet>
+                        </x:ExcelWorksheets>
+                    </x:ExcelWorkbook>
+                </xml>
+                <![endif]-->
+                <style>
+                    table { border-collapse: collapse; font-family: Arial, sans-serif; }
+                    th { background-color: #0f172a; color: #ffffff; font-weight: bold; padding: 10px; border: 1px solid #334155; }
+                    td { padding: 10px; border: 1px solid #cbd5e1; }
+                    .header-title { font-size: 16px; font-weight: bold; padding-bottom: 12px; color: #0f172a; }
+                    .metadata { font-size: 11px; color: #64748b; padding-bottom: 20px; }
+                </style>
+            </head>
+            <body>
+                <div class="header-title">Reporte de Asistencia Biométrica - BioAccess PRO</div>
+                <div class="metadata">Generado el: ${dateStr} | Total registros: ${attendanceData.length}</div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Nombre Completo</th>
+                            <th>Categoría o Curso</th>
+                            <th>Tipo de Rol</th>
+                            <th>Fecha</th>
+                            <th>Hora de Ingreso</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
 
             attendanceData.forEach(record => {
-                csvContent += `"${record.name}";"${record.role}";"${dateStr}";"${record.time}"\n`;
+                const cat = getCategoryDetails(record.role);
+                excelHtml += `
+                    <tr>
+                        <td style="font-weight: bold;">${record.name}</td>
+                        <td style="background-color: ${cat.hexBg}; color: ${cat.hexText}; font-weight: bold; border: 1px solid #94a3b8;">${record.role}</td>
+                        <td style="background-color: ${cat.hexBg}; color: ${cat.hexText}; text-transform: uppercase; font-size: 9px; font-weight: bold; border: 1px solid #94a3b8;">${cat.name}</td>
+                        <td>${dateStr}</td>
+                        <td style="font-family: monospace;">${record.time}</td>
+                    </tr>
+                `;
             });
 
-            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            excelHtml += `
+                    </tbody>
+                </table>
+            </body>
+            </html>
+            `;
+
+            // Creamos el blob con el tipo MIME correcto para hojas de cálculo de Excel
+            const blob = new Blob([excelHtml], { type: 'application/vnd.ms-excel;charset=utf-8;' });
             const url = URL.createObjectURL(blob);
             
             const link = document.createElement("a");
             link.setAttribute("href", url);
             const fileNameDate = new Date().toISOString().split('T')[0];
-            link.setAttribute("download", `Marcas_Biometricas_${fileNameDate}.csv`);
+            link.setAttribute("download", `Marcas_Biometricas_${fileNameDate}.xls`);
             
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
             
-            showToast("Planilla Excel exportada exitosamente.", "success");
+            showToast("Planilla Excel coloreada exportada exitosamente.", "success");
         });
 
         function showToast(message, type = 'success') {
