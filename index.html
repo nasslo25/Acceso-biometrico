@@ -87,9 +87,7 @@
     <!-- Contenido Principal Split -->
     <main class="flex-1 flex flex-col lg:flex-row overflow-hidden">
         
-        <!-- ========================================== -->
-        <!-- PANEL IZQUIERDO: REGISTRO DE PERSONAS      -->
-        <!-- ========================================== -->
+        <!-- PANEL IZQUIERDO: REGISTRO DE PERSONAS -->
         <section class="w-full lg:w-[320px] bg-slate-900 border-r border-slate-800 flex flex-col shrink-0 z-10 shadow-lg">
             <div class="p-5 border-b border-slate-800 bg-slate-900/50">
                 <h2 class="text-sm font-semibold uppercase tracking-wider text-slate-300 mb-4 flex items-center gap-2">
@@ -149,9 +147,7 @@
             </div>
         </section>
 
-        <!-- ========================================================================= -->
-        <!-- ÁREA CENTRAL: PANEL DE ESCÁNER GIGANTE CON MINI REGISTRO FLOTANTE (PiP)   -->
-        <!-- ========================================================================= -->
+        <!-- ÁREA CENTRAL: PANEL DE ESCÁNER GIGANTE CON MINI REGISTRO FLOTANTE (PiP) -->
         <section class="flex-1 bg-slate-950 flex flex-col p-4 md:p-6 justify-center items-center overflow-hidden">
             
             <!-- CONTENEDOR BASE GIGANTE (Muestra el Escáner de Acceso) -->
@@ -180,9 +176,7 @@
                     </select>
                 </div>
 
-                <!-- ========================================== -->
-                <!-- MINI VENTANA FLOTANTE: CÁMARA 1 (REGISTRO)  -->
-                <!-- ========================================== -->
+                <!-- MINI VENTANA FLOTANTE: CÁMARA 1 (REGISTRO) -->
                 <div class="absolute top-4 left-4 w-44 sm:w-56 bg-slate-900/95 backdrop-blur-md border border-slate-700/60 rounded-2xl p-2.5 shadow-2xl z-30 flex flex-col gap-2 transition-all hover:scale-[1.02]">
                     <div class="flex items-center justify-between gap-1">
                         <div class="flex items-center gap-1 shrink-0">
@@ -214,9 +208,7 @@
             </div>
         </section>
 
-        <!-- ========================================== -->
-        <!-- PANEL DERECHO: REPORTE DE ASISTENCIA       -->
-        <!-- ========================================== -->
+        <!-- PANEL DERECHO: REPORTE DE ASISTENCIA -->
         <section class="w-full lg:w-[320px] bg-slate-900 border-l border-slate-800 flex flex-col shrink-0 z-10 shadow-lg">
             
             <div class="p-5 border-b border-slate-800 flex justify-between items-center bg-slate-900/50">
@@ -268,9 +260,7 @@
         </div>
     </div>
 
-    <!-- ========================================== -->
-    <!-- CONFIGURACIÓN Y LÓGICA PRINCIPAL JAVASCRIPT-->
-    <!-- ========================================== -->
+    <!-- CONFIGURACIÓN Y LÓGICA PRINCIPAL JAVASCRIPT -->
     <script type="module">
         // ----------------------------------------------------------------------
         // 1. IMPORTACIONES FIREBASE
@@ -282,25 +272,21 @@
         // ----------------------------------------------------------------------
         // 2. REFERENCIAS A ELEMENTOS DEL DOM
         // ----------------------------------------------------------------------
-        // Cámaras y Canvas (Registro)
         const videoReg = document.getElementById('webcamReg');
         const canvasReg = document.getElementById('overlayCanvasReg');
         const videoPlaceholderReg = document.getElementById('videoPlaceholderReg');
         const cameraRegSelect = document.getElementById('cameraRegSelect');
         
-        // Cámaras y Canvas (Escaneo)
         const videoScan = document.getElementById('webcamScan');
         const canvasScan = document.getElementById('overlayCanvasScan');
         const videoPlaceholderScan = document.getElementById('videoPlaceholderScan');
         const cameraScanSelect = document.getElementById('cameraScanSelect');
         
-        // Indicadores de Estado
         const statusIndicator = document.getElementById('statusIndicator');
         const statusText = document.getElementById('statusText');
         const cloudStatus = document.getElementById('cloudStatus');
         const toastContainer = document.getElementById('toastContainer');
         
-        // Formulario de Registro
         const btnCapture = document.getElementById('btnCapture');
         const newPersonName = document.getElementById('newPersonName');
         const newPersonRoleSelect = document.getElementById('newPersonRoleSelect');
@@ -309,19 +295,16 @@
         const customRoleContainer = document.getElementById('customRoleContainer');
         const newPersonCustomRole = document.getElementById('newPersonCustomRole');
         
-        // Base de Datos UI
         const registeredList = document.getElementById('registeredList');
         const registeredCount = document.getElementById('registeredCount');
         const emptyDbMsg = document.getElementById('emptyDbMsg');
         
-        // Reporte de Asistencia UI
         const attendanceLogContainer = document.getElementById('attendanceLog');
         const totalAttendanceDisplay = document.getElementById('totalAttendance');
         const btnExport = document.getElementById('btnExport');
         const btnClearLog = document.getElementById('btnClearLog');
         const chkReportAlways = document.getElementById('chkReportAlways');
 
-        // Modal Personalizado de Confirmación
         const confirmModal = document.getElementById('confirmModal');
         const confirmModalBox = document.getElementById('confirmModalBox');
         const btnCancelClear = document.getElementById('btnCancelClear');
@@ -331,26 +314,23 @@
         // 3. VARIABLES DE ESTADO GLOBAL
         // ----------------------------------------------------------------------
         let isModelLoaded = false;
-        let isCapturing = false; // Detiene loops temporalmente durante guardado
-        let isFaceInRegistrationZone = false; // Valida que haya rostro antes de disparar guardar
+        let isCapturing = false; 
+        let isFaceInRegistrationZone = false; 
         
         let streamReg = null;
         let streamScan = null;
         let displaySizeReg = { width: 640, height: 480 };
         let displaySizeScan = { width: 640, height: 480 };
         
-        // Base de Datos Biométrica en Memoria
         let registeredProfiles = []; 
         let faceMatcher = null; 
         const userRoles = {};
         
-        // Datos de Asistencia y Prevención de Duplicados (Cooldown)
         let attendanceData = []; 
         const lastSeen = {}; 
-        const loggedToday = {}; // Almacena quién se ha registrado en el día actual para limitar a 1 marca diaria
-        const COOLDOWN_MS = 30000; // 30 segundos entre marcas para la misma persona (solo cuando "Reportar siempre" está activo)
+        const loggedToday = {}; 
+        const COOLDOWN_MS = 30000; 
 
-        // Firebase Auth y DB
         let app, db, currentUser, appId;
         let isFirebaseActive = false;
 
@@ -366,8 +346,8 @@
                     bg: 'bg-cyan-500/10 border-cyan-500/20 text-cyan-400',
                     badge: 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/30',
                     lineAccent: 'bg-cyan-500',
-                    hexBg: '#e0f2fe',  // Fondo Azul Celeste pastel para Excel
-                    hexText: '#0369a1' // Texto azul oscuro para Excel
+                    hexBg: '#e0f2fe',  
+                    hexText: '#0369a1' 
                 };
             } else if (r.includes('docente') || r.includes('educador')) {
                 return {
@@ -375,8 +355,8 @@
                     bg: 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400',
                     badge: 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30',
                     lineAccent: 'bg-emerald-500',
-                    hexBg: '#d1fae5',  // Fondo Verde pastel para Excel
-                    hexText: '#047857' // Texto verde oscuro
+                    hexBg: '#d1fae5',  
+                    hexText: '#047857' 
                 };
             } else if (r.includes('administrativo')) {
                 return {
@@ -384,8 +364,8 @@
                     bg: 'bg-indigo-500/10 border-indigo-500/20 text-indigo-400',
                     badge: 'bg-indigo-500/20 text-indigo-400 border border-indigo-500/30',
                     lineAccent: 'bg-indigo-500',
-                    hexBg: '#e0e7ff',  // Fondo Indigo pastel para Excel
-                    hexText: '#4338ca' // Texto índigo oscuro
+                    hexBg: '#e0e7ff',  
+                    hexText: '#4338ca' 
                 };
             } else if (r.includes('visita')) {
                 return {
@@ -393,8 +373,8 @@
                     bg: 'bg-amber-500/10 border-amber-500/20 text-amber-400',
                     badge: 'bg-amber-500/20 text-amber-400 border border-amber-500/30',
                     lineAccent: 'bg-amber-500',
-                    hexBg: '#fef3c7',  // Fondo Amarillo pastel para Excel
-                    hexText: '#b45309' // Texto ocre/naranja oscuro
+                    hexBg: '#fef3c7',  
+                    hexText: '#b45309' 
                 };
             } else if (r.includes('apoderado')) {
                 return {
@@ -402,8 +382,8 @@
                     bg: 'bg-purple-500/10 border-purple-500/20 text-purple-400',
                     badge: 'bg-purple-500/20 text-purple-400 border border-purple-500/30',
                     lineAccent: 'bg-purple-500',
-                    hexBg: '#f3e8ff',  // Fondo Violeta pastel para Excel
-                    hexText: '#6d28d9' // Texto púrpura oscuro
+                    hexBg: '#f3e8ff',  
+                    hexText: '#6d28d9' 
                 };
             } else {
                 return {
@@ -411,8 +391,8 @@
                     bg: 'bg-slate-500/10 border-slate-500/20 text-slate-400',
                     badge: 'bg-slate-500/20 text-slate-400 border border-slate-500/30',
                     lineAccent: 'bg-slate-500',
-                    hexBg: '#f1f5f9',  // Fondo Gris pastel para Excel
-                    hexText: '#475569' // Texto gris oscuro
+                    hexBg: '#f1f5f9',  
+                    hexText: '#475569' 
                 };
             }
         }
@@ -420,32 +400,43 @@
         // ----------------------------------------------------------------------
         // 4. INICIALIZACIÓN Y CONFIGURACIÓN DE FIREBASE (NUBE)
         // ----------------------------------------------------------------------
-        function initFirebase() {
+        async function initFirebase() {
             try {
-                const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null;
-                appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-                
-                if (!firebaseConfig) {
-                    console.warn("Configuración de Firebase no encontrada. Ejecutando en modo local (sin nube).");
-                    setCloudStatus("Modo Local", "hard-drive", "text-slate-400", "bg-slate-800");
-                    updateRegisteredUI();
-                    return;
-                }
+                // Tus credenciales reales pre-configuradas y listas para publicar en GitHub
+                const miConfiguracionFirebase = {
+                    apiKey: "AIzaSyCis4BnaT4Pg4fj-AjvrGQwkNNxybOtKFE",
+                    authDomain: "asistencia-biometrica-tren.firebaseapp.com",
+                    projectId: "asistencia-biometrica-tren",
+                    storageBucket: "asistencia-biometrica-tren.firebasestorage.app",
+                    messagingSenderId: "105307990479",
+                    appId: "1:105307990479:web:98e3bb5f64e3d765608aba"
+                };
 
-                app = initializeApp(firebaseConfig);
+                appId = "asistencia-biometrica-tren";
+
+                app = initializeApp(miConfiguracionFirebase);
                 const auth = getAuth(app);
                 db = getFirestore(app);
                 isFirebaseActive = true;
 
-                // Logueo obligatorio previo a operaciones de consulta
-                signInAnonymously(auth);
+                // Autenticar de forma anónima para cumplir con las reglas de acceso
+                let userCredential = await signInAnonymously(auth);
+                currentUser = userCredential.user;
                 
+                if (currentUser) {
+                    setCloudStatus("Nube activa", "cloud", "text-cyan-400", "bg-cyan-950/30");
+                    await loadProfilesFromCloud();
+                } else {
+                    setCloudStatus("Desconectado", "cloud-off", "text-slate-400", "bg-slate-800");
+                }
+
                 onAuthStateChanged(auth, async (user) => {
-                    currentUser = user;
                     if (user) {
+                        currentUser = user;
                         setCloudStatus("Nube activa", "cloud", "text-cyan-400", "bg-cyan-950/30");
                         await loadProfilesFromCloud();
                     } else {
+                        currentUser = null;
                         setCloudStatus("Desconectado", "cloud-off", "text-slate-400", "bg-slate-800");
                     }
                 });
@@ -525,11 +516,10 @@
         }
 
         // ----------------------------------------------------------------------
-        // 6. GESTIÓN INTELIGENTE DE CÁMARAS (CONDUCCIÓN DE CONFLICTOS HARDWARE)
+        // 6. GESTIÓN DE CÁMARAS (CONDUCCIÓN DE CONFLICTOS HARDWARE)
         // ----------------------------------------------------------------------
         async function initCameras() {
             try {
-                // Solicitar permisos temporales rápidos para obtener los nombres específicos de las cámaras en lista
                 const tempStream = await navigator.mediaDevices.getUserMedia({ video: true });
                 tempStream.getTracks().forEach(track => track.stop());
 
@@ -546,12 +536,10 @@
                     });
                 });
 
-                // Si hay más de un dispositivo de video conectado, pre-asignar la cámara 2 al escáner de forma automática
                 if (videoDevices.length > 1) {
                     cameraScanSelect.selectedIndex = 1;
                 }
 
-                // Sincronizar y encender las cámaras seleccionadas en paralelo
                 await syncVideoStreams();
 
             } catch (err) {
@@ -564,7 +552,6 @@
             const idReg = cameraRegSelect.value;
             const idScan = cameraScanSelect.value;
 
-            // Apagar y liberar flujos de video anteriores correctamente (evitando el error de referencia en 'track')
             if (streamReg) {
                 streamReg.getTracks().forEach(t => t.stop());
                 streamReg = null;
@@ -575,7 +562,6 @@
             }
 
             try {
-                // CASO 1: Misma cámara seleccionada para ambos procesos (Clonación de Stream para prevenir bloqueo)
                 if (idReg === idScan) {
                     const constraints = {
                         video: idReg ? { deviceId: { exact: idReg }, width: 640, height: 480 } : { width: 640, height: 480 }
@@ -583,7 +569,7 @@
                     const sharedStream = await navigator.mediaDevices.getUserMedia(constraints);
                     
                     streamReg = sharedStream;
-                    streamScan = sharedStream.clone(); // Duplicado lógico del flujo de hardware
+                    streamScan = sharedStream.clone(); 
 
                     videoReg.srcObject = streamReg;
                     videoScan.srcObject = streamScan;
@@ -592,8 +578,6 @@
                     if(videoPlaceholderScan) videoPlaceholderScan.style.display = 'none';
 
                 } else {
-                    // CASO 2: Diferentes cámaras seleccionadas (Caminos independientes de captura física)
-                    // Configuración de Cámara 1 (Registro)
                     const constraintsReg = {
                         video: idReg ? { deviceId: { exact: idReg }, width: 640, height: 480 } : { width: 640, height: 480 }
                     };
@@ -601,7 +585,6 @@
                     videoReg.srcObject = streamReg;
                     if(videoPlaceholderReg) videoPlaceholderReg.style.display = 'none';
 
-                    // Configuración de Cámara 2 (Escáner)
                     const constraintsScan = {
                         video: idScan ? { deviceId: { exact: idScan }, width: 640, height: 480 } : { width: 640, height: 480 }
                     };
@@ -610,7 +593,6 @@
                     if(videoPlaceholderScan) videoPlaceholderScan.style.display = 'none';
                 }
 
-                // Configurar detectores de metadatos para alineación de canvas
                 videoReg.onloadedmetadata = () => {
                     displaySizeReg = { width: videoReg.videoWidth, height: videoReg.videoHeight };
                     faceapi.matchDimensions(canvasReg, displaySizeReg);
@@ -626,7 +608,6 @@
             }
         }
 
-        // Suscribir eventos de cambio de dispositivo
         cameraRegSelect.onchange = () => syncVideoStreams();
         cameraScanSelect.onchange = () => syncVideoStreams();
 
@@ -637,7 +618,6 @@
             const MODEL_URL = 'https://vladmandic.github.io/face-api/model/';
             
             try {
-                // Descarga paralela asíncrona de los modelos matemáticos
                 await faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL);
                 await faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL);
                 await faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL);
@@ -651,7 +631,6 @@
                 `;
                 lucide.createIcons();
                 
-                // Iniciar análisis inteligente recurrente en ambas pantallas
                 recognizeFacesLoop();
             } catch (err) {
                 console.error("Error cargando redes neuronales:", err);
@@ -665,19 +644,18 @@
         }
 
         // ----------------------------------------------------------------------
-        // 8. BUCLE PRINCIPAL DE RECONOCIMIENTO MULTICÁMARA (50/50)
+        // 8. BUCLE PRINCIPAL DE RECONOCIMIENTO MULTICÁMARA
         // ----------------------------------------------------------------------
         async function recognizeFacesLoop() {
             try {
                 if (isModelLoaded && !isCapturing) {
                     
-                    // --- SUB-CICLO 1: CÁMARA DE ENROLAMIENTO (Detección y encuadre rápido) ---
+                    // --- CÁMARA 1: REGISTRO (Detección de rostro) ---
                     if (videoReg && videoReg.readyState === 4 && videoReg.videoWidth > 0) {
                         if (canvasReg.width !== displaySizeReg.width) {
                             faceapi.matchDimensions(canvasReg, displaySizeReg);
                         }
 
-                        // Análisis veloz de caja contenedora
                         const detections = await faceapi.detectAllFaces(videoReg, new faceapi.TinyFaceDetectorOptions({ inputSize: 224, scoreThreshold: 0.3 }))
                                                         .withFaceLandmarks();
                         
@@ -686,17 +664,16 @@
                         ctx.clearRect(0, 0, canvasReg.width, canvasReg.height);
 
                         isFaceInRegistrationZone = resizedDetections.length > 0;
-                        btnCapture.disabled = !isFaceInRegistrationZone; // Se habilita guardar solo si hay un rostro posicionado
+                        btnCapture.disabled = !isFaceInRegistrationZone; 
 
                         resizedDetections.forEach(det => {
                             const box = det.detection.box;
                             
-                            // Rectángulo de seguimiento dinámico cian
                             ctx.strokeStyle = "#06b6d4";
                             ctx.lineWidth = 3;
-                            ctx.setLineDash([5, 5]); // Punteado para diseño tecnológico
+                            ctx.setLineDash([5, 5]); 
                             ctx.strokeRect(box.x, box.y, box.width, box.height);
-                            ctx.setLineDash([]); // Resetear
+                            ctx.setLineDash([]); 
                             
                             ctx.fillStyle = "#06b6d4";
                             ctx.font = "bold 13px sans-serif";
@@ -704,7 +681,7 @@
                         });
                     }
 
-                    // --- SUB-CICLO 2: CÁMARA DE ESCANEO (Reconocimiento continuo y clasificación) ---
+                    // --- CÁMARA 2: ESCANEO (Reconocimiento activo) ---
                     if (videoScan && videoScan.readyState === 4 && videoScan.videoWidth > 0) {
                         if (canvasScan.width !== displaySizeScan.width) {
                             faceapi.matchDimensions(canvasScan, displaySizeScan);
@@ -722,37 +699,33 @@
                             const box = detection.detection.box;
                             let label = "Desconocido";
                             let roleDisplay = "";
-                            let color = "#ef4444"; // Rojo (No identificado)
+                            let color = "#ef4444"; 
                             
                             if (faceMatcher) {
                                 const bestMatch = faceMatcher.findBestMatch(detection.descriptor);
                                 if (bestMatch.label !== 'unknown') {
                                     label = bestMatch.label;
                                     roleDisplay = userRoles[label] || '';
-                                    color = "#10b981"; // Verde (Identificado)
+                                    color = "#10b981"; 
                                     logAttendance(label);
                                 } else {
                                     label = `No Registrado`;
                                 }
                             }
 
-                            // Dibujar caja contenedora
                             ctx.strokeStyle = color;
                             ctx.lineWidth = 4;
                             ctx.strokeRect(box.x, box.y, box.width, box.height);
 
-                            // Dibujar fondo de texto
                             ctx.fillStyle = color;
                             const textWidth = ctx.measureText(label).width;
                             const boxHeight = roleDisplay ? 40 : 25;
                             ctx.fillRect(box.x - 1.5, box.y - boxHeight, Math.max(textWidth, 120) + 15, boxHeight);
 
-                            // Dibujar texto de nombre
                             ctx.fillStyle = "#ffffff";
                             ctx.font = "bold 14px sans-serif";
                             ctx.fillText(label, box.x + 5, box.y - (roleDisplay ? 22 : 7));
                             
-                            // Cargo o Curso
                             if (roleDisplay) {
                                 ctx.fillStyle = "rgba(255, 255, 255, 0.9)";
                                 ctx.font = "11px sans-serif";
@@ -799,7 +772,7 @@
             } else if (roleSelection === 'Otro') {
                 const custom = newPersonCustomRole.value.trim();
                 if (!custom) {
-                    showToast("Por favor, especifica la categoría del trabajador.", "error");
+                    showToast("Por favor, especifica la categoría.", "error");
                     newPersonCustomRole.focus();
                     return;
                 }
@@ -808,24 +781,21 @@
                 finalRole = roleSelection;
             }
 
-            // Desactivar ciclos de render y botón para máxima potencia de análisis facial
             isCapturing = true;
             btnCapture.disabled = true;
             btnCapture.innerHTML = "Analizando Rostro...";
 
-            // Breve limpieza y estabilización física de cámara
             const ctxReg = canvasReg.getContext('2d');
             ctxReg.clearRect(0, 0, canvasReg.width, canvasReg.height);
             await new Promise(r => setTimeout(r, 400));
 
             try {
-                // Extracción facial única estricta de 128 números desde la Cámara 1 (Enrolamiento)
                 const detection = await faceapi.detectSingleFace(videoReg, new faceapi.TinyFaceDetectorOptions({ inputSize: 320, scoreThreshold: 0.3 }))
                                                .withFaceLandmarks()
                                                .withFaceDescriptor();
 
                 if (!detection) {
-                    showToast("No se detectó un rostro claro en Cámara 1. Mira fijamente con buena iluminación.", "error");
+                    showToast("No se detectó un rostro claro en Cámara 1. Mira de frente con buena luz.", "error");
                 } else {
                     userRoles[name] = finalRole;
 
@@ -840,12 +810,10 @@
                     
                     faceMatcher = new faceapi.FaceMatcher(registeredProfiles, 0.50);
                     
-                    // Guardado directo en la nube de Firebase
                     await saveProfileToCloud(name, finalRole, detection.descriptor);
 
                     showToast(`¡${name} registrado con éxito en el sistema!`);
                     
-                    // Limpieza del formulario
                     newPersonName.value = '';
                     newPersonRoleSelect.value = '';
                     newPersonCourse.value = '';
@@ -911,22 +879,18 @@
         // ----------------------------------------------------------------------
         function logAttendance(name) {
             const now = Date.now();
-            const todayStr = new Date().toDateString(); // Obtener fecha única de hoy
+            const todayStr = new Date().toDateString(); 
             
-            // 1. COMPORTAMIENTO PRINCIPAL: Control estricto de duplicados por día
             if (chkReportAlways && !chkReportAlways.checked) {
-                // Si la persona ya marcó hoy, bloquear registros repetidos por completo
                 if (loggedToday[name] === todayStr) {
                     return; 
                 }
             } else {
-                // 2. COMPORTAMIENTO SECUNDARIO: "Reportar Siempre" (cooldown clásico de 30 segundos)
                 if (lastSeen[name] && (now - lastSeen[name] < COOLDOWN_MS)) {
                     return; 
                 }
             }
             
-            // Registrar fecha de la marca actual para la persona
             lastSeen[name] = now;
             loggedToday[name] = todayStr;
             
@@ -942,7 +906,6 @@
             
             updateAttendanceUI(name, role, timeStr);
             
-            // Audio de confirmación exitosa
             try {
                 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
                 const osc = audioCtx.createOscillator();
@@ -962,7 +925,6 @@
             const cat = getCategoryDetails(role);
             const div = document.createElement('div');
             
-            // Estructura moderna con un borde lateral acentuado del color de la categoría correspondiente
             div.className = "flex justify-between items-center bg-slate-900/60 border border-slate-800 p-3 rounded-lg animate-fadeIn shadow-md relative overflow-hidden";
             div.innerHTML = `
                 <div class="absolute left-0 top-0 bottom-0 w-1 ${cat.lineAccent}"></div>
@@ -984,9 +946,7 @@
             lucide.createIcons();
         }
 
-        // --- SISTEMA DE DIÁLOGO MODAL PERSONALIZADO ---
         btnClearLog.addEventListener('click', () => {
-            // Mostrar modal personalizado en lugar del "confirm" nativo
             confirmModal.classList.remove('hidden');
             setTimeout(() => {
                 confirmModal.classList.remove('opacity-0');
@@ -1015,7 +975,6 @@
             attendanceLogContainer.innerHTML = `<div class="text-center text-xs text-slate-500 py-8" id="emptyLogMsg">No se registran marcas de ingreso.</div>`;
             totalAttendanceDisplay.innerText = "0";
             
-            // Vaciar estructuras de rastreo de rostros
             for (let key in lastSeen) {
                 delete lastSeen[key]; 
             }
@@ -1035,7 +994,6 @@
 
             const dateStr = new Date().toLocaleDateString();
             
-            // Construimos un documento XML / HTML compatible con Microsoft Excel que sí permite aplicar colores a celdas
             let excelHtml = `
             <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
             <head>
@@ -1098,7 +1056,6 @@
             </html>
             `;
 
-            // Creamos el blob con el tipo MIME correcto para hojas de cálculo de Excel
             const blob = new Blob([excelHtml], { type: 'application/vnd.ms-excel;charset=utf-8;' });
             const url = URL.createObjectURL(blob);
             
@@ -1156,7 +1113,7 @@
         // ----------------------------------------------------------------------
         async function init() {
             lucide.createIcons();
-            initFirebase();
+            await initFirebase();
             await initCameras();
             await loadModels();
         }
