@@ -45,7 +45,7 @@
                 <h3 class="text-base font-bold text-slate-200">¿Limpiar marcas de hoy?</h3>
             </div>
             <p class="text-xs text-slate-400 mb-6 leading-relaxed">
-                Esta acción vaciará la bitácora de asistencia de hoy y permitirá registrar nuevamente a las personas. No se puede deshacer.
+                Esta acción vaciará la bitácora de asistencia de hoy en la pantalla y en el servidor. Las marcas de días anteriores permanecerán intactas en la base de datos para tus reportes mensuales.
             </p>
             <div class="flex gap-3 justify-end">
                 <button id="btnCancelClear" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-xs font-semibold transition">
@@ -53,6 +53,49 @@
                 </button>
                 <button id="btnConfirmClear" class="px-4 py-2 bg-rose-600 hover:bg-rose-500 text-white rounded-lg text-xs font-bold transition shadow-lg shadow-rose-950/20">
                     Confirmar Limpieza
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Exportación de Reportes Avanzados -->
+    <div id="reportModal" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 flex items-center justify-center hidden opacity-0 transition-opacity duration-300 pointer-events-none">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 max-w-md w-full mx-4 shadow-2xl transform scale-95 transition-all duration-300" id="reportModalBox">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3 mb-4">
+                <div class="flex items-center gap-2.5 text-cyan-400">
+                    <i data-lucide="file-spreadsheet" class="w-5 h-5"></i>
+                    <h3 class="text-base font-bold text-slate-200">Exportar Reportes Históricos</h3>
+                </div>
+                <button id="btnCloseReportModal" class="text-slate-400 hover:text-white transition p-1 rounded-lg hover:bg-slate-800">
+                    <i data-lucide="x" class="w-4 h-4"></i>
+                </button>
+            </div>
+            
+            <p class="text-xs text-slate-400 mb-4 leading-relaxed">
+                Selecciona el rango de tiempo para generar el reporte de asistencia detallado en formato Excel:
+            </p>
+
+            <div class="space-y-3 mb-6">
+                <!-- Select de Rango -->
+                <div>
+                    <label class="block text-xs text-slate-400 mb-1.5 font-medium">Período del Reporte</label>
+                    <select id="reportPeriodSelect" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2.5 text-sm focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 focus:outline-none text-slate-200 transition">
+                        <option value="today">Diario (Sólo Hoy)</option>
+                        <option value="week">Semanal (Últimos 7 días)</option>
+                        <option value="month" selected>Mensual (Mes Actual)</option>
+                        <option value="year">Anual (Año en Curso)</option>
+                        <option value="all">Historial Completo (Todo el registro)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="flex gap-3 justify-end">
+                <button id="btnCancelReport" class="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-xs font-semibold transition">
+                    Cerrar
+                </button>
+                <button id="btnGenerateReport" class="px-5 py-2.5 bg-cyan-600 hover:bg-cyan-500 text-white rounded-lg text-xs font-bold transition shadow-lg shadow-cyan-950/20 flex items-center gap-2">
+                    <i data-lucide="download" class="w-3.5 h-3.5"></i>
+                    Generar y Descargar Excel
                 </button>
             </div>
         </div>
@@ -84,7 +127,7 @@
         </div>
     </header>
 
-    <!-- Contenido Principal Split (Con control de visibilidad responsive) -->
+    <!-- Contenido Principal Split -->
     <main class="flex-1 flex flex-col lg:flex-row overflow-hidden relative">
         
         <!-- PANEL IZQUIERDO: REGISTRO DE PERSONAS -->
@@ -240,13 +283,13 @@
             <!-- Resumen y Exportación -->
             <div class="p-5 bg-slate-950 border-t border-slate-800">
                 <div class="flex justify-between items-center text-sm font-medium text-slate-300 mb-4 bg-slate-900 p-3 rounded-lg border border-slate-800">
-                    <span>Total Asistencias:</span>
+                    <span>Ingresos Hoy:</span>
                     <span id="totalAttendance" class="font-bold text-cyan-400 font-mono text-lg">0</span>
                 </div>
                 
-                <button id="btnExport" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 py-2.5 rounded-lg text-sm font-semibold transition flex items-center justify-center gap-2 group">
-                    <i data-lucide="file-spreadsheet" class="w-4 h-4 text-emerald-400 group-hover:scale-110 transition-transform"></i> 
-                    Descargar Excel
+                <button id="btnOpenReportModal" class="w-full bg-gradient-to-r from-cyan-600 to-teal-600 hover:from-cyan-500 hover:to-teal-500 text-white py-3 rounded-xl text-sm font-bold transition flex items-center justify-center gap-2 group shadow-lg shadow-cyan-950/20">
+                    <i data-lucide="file-spreadsheet" class="w-4 h-4 group-hover:scale-110 transition-transform"></i> 
+                    Exportar Reportes
                 </button>
             </div>
         </section>
@@ -284,7 +327,7 @@
         // ----------------------------------------------------------------------
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, getDocs, doc, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, collection, getDocs, doc, setDoc, query, where, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // ----------------------------------------------------------------------
         // 2. REFERENCIAS A ELEMENTOS DEL DOM
@@ -318,7 +361,6 @@
         
         const attendanceLogContainer = document.getElementById('attendanceLog');
         const totalAttendanceDisplay = document.getElementById('totalAttendance');
-        const btnExport = document.getElementById('btnExport');
         const btnClearLog = document.getElementById('btnClearLog');
         const chkReportAlways = document.getElementById('chkReportAlways');
 
@@ -326,6 +368,15 @@
         const confirmModalBox = document.getElementById('confirmModalBox');
         const btnCancelClear = document.getElementById('btnCancelClear');
         const btnConfirmClear = document.getElementById('btnConfirmClear');
+
+        // Elementos del Modal de Reportes Avanzados
+        const btnOpenReportModal = document.getElementById('btnOpenReportModal');
+        const reportModal = document.getElementById('reportModal');
+        const reportModalBox = document.getElementById('reportModalBox');
+        const btnCloseReportModal = document.getElementById('btnCloseReportModal');
+        const btnCancelReport = document.getElementById('btnCancelReport');
+        const btnGenerateReport = document.getElementById('btnGenerateReport');
+        const reportPeriodSelect = document.getElementById('reportPeriodSelect');
 
         // Referencias del sistema responsivo de pestañas
         const tabRegister = document.getElementById('tabRegister');
@@ -359,18 +410,19 @@
 
         let app, db, currentUser, appId;
         let isFirebaseActive = false;
+        
+        // Variable para controlar el cambio de fecha (Reinicio de las 00:00 Hrs)
+        let currentSessionDay = new Date().toDateString();
 
         // ----------------------------------------------------------------------
         // 4. LÓGICA DE CONTROL DE PESTAÑAS RESPONSIVO (MÓVIL / TABLET)
         // ----------------------------------------------------------------------
         function switchTab(activeTab) {
-            // Resetear estilos visuales de los botones de navegación
             [tabRegister, tabScanner, tabAttendance].forEach(t => {
                 t.classList.remove('text-cyan-400', 'bg-slate-800/50');
                 t.classList.add('text-slate-400');
             });
 
-            // Ocultar todos los paneles para la vista móvil
             panelRegister.classList.add('hidden');
             panelRegister.classList.remove('flex');
             panelScanner.classList.add('hidden');
@@ -378,7 +430,6 @@
             panelAttendance.classList.add('hidden');
             panelAttendance.classList.remove('flex');
 
-            // Mostrar el panel seleccionado aplicando flexbox dinámico
             if (activeTab === 'register') {
                 tabRegister.classList.add('text-cyan-400', 'bg-slate-800/50');
                 tabRegister.classList.remove('text-slate-400');
@@ -390,7 +441,6 @@
                 panelScanner.classList.remove('hidden');
                 panelScanner.classList.add('flex');
                 
-                // Forzar sincronización de dimensiones al activar la cámara del escáner
                 setTimeout(() => {
                     if (videoScan && videoScan.readyState === 4) {
                         displaySizeScan = { width: videoScan.videoWidth, height: videoScan.videoHeight };
@@ -405,15 +455,12 @@
             }
         }
 
-        // Asignar listeners táctiles y de clicks a los botones de navegación móvil
         tabRegister.addEventListener('click', () => switchTab('register'));
         tabScanner.addEventListener('click', () => switchTab('scanner'));
         tabAttendance.addEventListener('click', () => switchTab('attendance'));
 
-        // Controlar el redimensionamiento dinámico de la ventana (Rotar pantalla / cambiar tamaño)
         window.addEventListener('resize', () => {
             if (window.innerWidth >= 1024) {
-                // En computadoras de escritorio, volver a forzar la visualización conjunta de los 3 paneles
                 panelRegister.classList.remove('hidden');
                 panelRegister.classList.add('flex');
                 panelScanner.classList.remove('hidden');
@@ -421,14 +468,12 @@
                 panelAttendance.classList.remove('hidden');
                 panelAttendance.classList.add('flex');
             } else {
-                // En móviles, restaurar el panel activo seleccionado
                 const activeBtn = [tabRegister, tabScanner, tabAttendance].find(t => t.classList.contains('text-cyan-400'));
                 if (activeBtn === tabRegister) switchTab('register');
                 else if (activeBtn === tabAttendance) switchTab('attendance');
                 else switchTab('scanner');
             }
 
-            // Actualizar dimensiones de capas de rastreo biométrico
             if (videoReg && videoReg.readyState === 4) {
                 displaySizeReg = { width: videoReg.videoWidth, height: videoReg.videoHeight };
                 faceapi.matchDimensions(canvasReg, displaySizeReg);
@@ -523,13 +568,13 @@
                 db = getFirestore(app);
                 isFirebaseActive = true;
 
-                // Autenticar de forma anónima para cumplir con las reglas de acceso
                 let userCredential = await signInAnonymously(auth);
                 currentUser = userCredential.user;
                 
                 if (currentUser) {
                     setCloudStatus("Nube activa", "cloud", "text-cyan-400", "bg-cyan-950/30");
                     await loadProfilesFromCloud();
+                    await loadAttendanceFromCloud();
                 } else {
                     setCloudStatus("Desconectado", "cloud-off", "text-slate-400", "bg-slate-800");
                 }
@@ -539,6 +584,7 @@
                         currentUser = user;
                         setCloudStatus("Nube activa", "cloud", "text-cyan-400", "bg-cyan-950/30");
                         await loadProfilesFromCloud();
+                        await loadAttendanceFromCloud();
                     } else {
                         currentUser = null;
                         setCloudStatus("Desconectado", "cloud-off", "text-slate-400", "bg-slate-800");
@@ -589,7 +635,7 @@
                 
                 updateRegisteredUI();
             } catch (error) {
-                console.error("Error al cargar desde Firestore:", error);
+                console.error("Error al cargar perfiles:", error);
                 showToast("No se pudieron descargar los perfiles de la nube.", "error");
                 updateRegisteredUI();
             }
@@ -614,13 +660,73 @@
                 
                 showToast(`Perfil de ${name} guardado con éxito en la nube.`, "success");
             } catch (error) {
-                console.error("Error al guardar en Firestore:", error);
+                console.error("Error al guardar perfil:", error);
                 showToast("No se pudo guardar el perfil en la base de datos.", "error");
             }
         }
 
         // ----------------------------------------------------------------------
-        // 8. GESTIÓN DE CÁMARAS (CONDUCCIÓN DE CONFLICTOS HARDWARE)
+        // 7.1 OPERACIONES DE ASISTENCIA EN FIRESTORE (RESPETANDO REGLAS DE MEMORIA)
+        // ----------------------------------------------------------------------
+        async function saveAttendanceToCloud(record) {
+            if (!currentUser || !isFirebaseActive) return;
+            try {
+                const logsRef = collection(db, 'artifacts', appId, 'users', currentUser.uid, 'attendanceLogs');
+                const docId = `${record.name}_${record.timestamp}`;
+                await setDoc(doc(logsRef, docId), record);
+            } catch (error) {
+                console.error("Error al guardar asistencia:", error);
+            }
+        }
+
+        async function loadAttendanceFromCloud() {
+            if (!currentUser || !isFirebaseActive) return;
+            try {
+                const todayStr = new Date().toDateString();
+                const logsRef = collection(db, 'artifacts', appId, 'users', currentUser.uid, 'attendanceLogs');
+                
+                // Con el fin de cumplir estrictamente la Regla 2 (No queries complejas, no orderBy y no where compuestos)
+                // y para soportar reportes históricos sin fallar, descargamos y filtramos de forma segura en memoria JS.
+                const snapshot = await getDocs(logsRef);
+
+                attendanceData = [];
+                attendanceLogContainer.innerHTML = '';
+
+                const loadedRecords = [];
+                snapshot.forEach(docSnap => {
+                    const data = docSnap.data();
+                    // Sólo cargamos para el panel activo en pantalla los registros del día de hoy
+                    if (data.dateStr === todayStr) {
+                        loadedRecords.push({
+                            id: docSnap.id,
+                            ...data
+                        });
+                    }
+                });
+
+                // Ordenamos en memoria
+                loadedRecords.sort((a, b) => a.timestamp - b.timestamp);
+
+                loadedRecords.forEach(record => {
+                    attendanceData.push(record);
+                    loggedToday[record.name] = todayStr;
+                    lastSeen[record.name] = record.timestamp;
+                    updateAttendanceUI(record.name, record.role, record.time);
+                });
+
+                if (attendanceData.length === 0) {
+                    attendanceLogContainer.innerHTML = `<div class="text-center text-xs text-slate-500 py-8" id="emptyLogMsg">No se registran marcas de ingreso.</div>`;
+                }
+                totalAttendanceDisplay.innerText = attendanceData.length;
+
+            } catch (error) {
+                console.error("Error al cargar asistencias de hoy:", error);
+                showToast("No se pudieron cargar las asistencias previas.", "error");
+            }
+        }
+
+        // ----------------------------------------------------------------------
+        // 8. GESTIÓN DE CÁMARAS
         // ----------------------------------------------------------------------
         async function initCameras() {
             try {
@@ -647,8 +753,8 @@
                 await syncVideoStreams();
 
             } catch (err) {
-                console.error("Error de acceso o enumeración de cámaras:", err);
-                showToast("Por favor, habilita el permiso de acceso a la cámara en el navegador.", "error");
+                console.error("Error de acceso a cámaras:", err);
+                showToast("Por favor, habilita el permiso de acceso a la cámara.", "error");
             }
         }
 
@@ -707,8 +813,8 @@
                 };
 
             } catch (err) {
-                console.error("Error al intentar iniciar flujos de cámara:", err);
-                showToast("Fallo al iniciar el hardware de las cámaras seleccionadas.", "error");
+                console.error("Error al iniciar flujos:", err);
+                showToast("Fallo al iniciar el hardware de las cámaras.", "error");
             }
         }
 
@@ -737,24 +843,38 @@
                 
                 recognizeFacesLoop();
             } catch (err) {
-                console.error("Error cargando redes neuronales:", err);
+                console.error("Error cargando redes:", err);
                 statusIndicator.className = "flex items-center gap-2 px-3 py-1.5 rounded-full bg-rose-500/10 border border-rose-500/30 text-rose-400 text-xs font-medium";
                 statusIndicator.innerHTML = `
                     <i data-lucide="alert-triangle" class="w-4 h-4 text-rose-400"></i>
                     <span>Fallo de Red IA</span>
                 `;
-                showToast("Error de conexión de red al descargar archivos neuronales.", "error");
+                showToast("Error de conexión al cargar archivos biométricos.", "error");
             }
         }
 
         // ----------------------------------------------------------------------
-        // 10. BUCLE PRINCIPAL DE RECONOCIMIENTO MULTICÁMARA
+        // 10. BUCLE PRINCIPAL DE RECONOCIMIENTO Y CONTROL AUTOMÁTICO DE TIEMPO
         // ----------------------------------------------------------------------
         async function recognizeFacesLoop() {
             try {
-                if (isModelLoaded && !isCapturing) {
+                const todayStr = new Date().toDateString();
+                if (currentSessionDay !== todayStr) {
+                    currentSessionDay = todayStr;
+                    // Limpiamos la lista en la pantalla
+                    attendanceData = [];
+                    attendanceLogContainer.innerHTML = `<div class="text-center text-xs text-slate-500 py-8" id="emptyLogMsg">No se registran marcas de ingreso.</div>`;
+                    totalAttendanceDisplay.innerText = "0";
                     
-                    // --- CÁMARA 1: REGISTRO (Detección de rostro) ---
+                    // Limpiamos los cooldowns de hoy
+                    for (let key in lastSeen) delete lastSeen[key];
+                    for (let key in loggedToday) delete loggedToday[key];
+                    
+                    showToast("¡Nueva jornada iniciada de forma automática! Pantalla lista.", "info");
+                }
+
+                if (isModelLoaded && !isCapturing) {
+                    // --- CÁMARA 1: REGISTRO ---
                     if (videoReg && videoReg.readyState === 4 && videoReg.videoWidth > 0) {
                         if (canvasReg.width !== displaySizeReg.width) {
                             faceapi.matchDimensions(canvasReg, displaySizeReg);
@@ -785,7 +905,7 @@
                         });
                     }
 
-                    // --- CÁMARA 2: ESCANEO (Reconocimiento activo) ---
+                    // --- CÁMARA 2: ESCANEO ---
                     if (videoScan && videoScan.readyState === 4 && videoScan.videoWidth > 0) {
                         if (canvasScan.width !== displaySizeScan.width) {
                             faceapi.matchDimensions(canvasScan, displaySizeScan);
@@ -839,13 +959,13 @@
                     }
                 }
             } catch (err) {
-                console.error("Error en loop de renders biométricos:", err);
+                console.error("Error en loop biométrico:", err);
             }
             requestAnimationFrame(recognizeFacesLoop);
         }
 
         // ----------------------------------------------------------------------
-        // 11. LÓGICA DE REGISTRO / ENROLAMIENTO (MÉTODO CAPTURA)
+        // 11. REGISTRO / ENROLAMIENTO
         // ----------------------------------------------------------------------
         newPersonRoleSelect.addEventListener('change', (e) => {
             const val = e.target.value;
@@ -899,7 +1019,7 @@
                                                .withFaceDescriptor();
 
                 if (!detection) {
-                    showToast("No se detectó un rostro claro en Cámara 1. Mira de frente con buena luz.", "error");
+                    showToast("No se detectó un rostro en Cámara 1. Inténtalo de nuevo.", "error");
                 } else {
                     userRoles[name] = finalRole;
 
@@ -916,7 +1036,7 @@
                     
                     await saveProfileToCloud(name, finalRole, detection.descriptor);
 
-                    showToast(`¡${name} registrado con éxito en el sistema!`);
+                    showToast(`¡${name} registrado con éxito!`);
                     
                     newPersonName.value = '';
                     newPersonRoleSelect.value = '';
@@ -929,7 +1049,7 @@
                 }
             } catch (err) {
                 console.error("Fallo de captura:", err);
-                showToast("Error inesperado al generar firma biométrica.", "error");
+                showToast("Error al generar firma biométrica.", "error");
             } finally {
                 isCapturing = false;
                 btnCapture.disabled = false;
@@ -1001,14 +1121,18 @@
             const role = userRoles[name] || 'Sin asignar';
             const timeStr = new Date().toLocaleTimeString();
             
-            attendanceData.push({
+            const record = {
                 name: name,
                 role: role,
                 time: timeStr,
-                timestamp: now
-            });
+                timestamp: now,
+                dateStr: todayStr
+            };
             
+            attendanceData.push(record);
             updateAttendanceUI(name, role, timeStr);
+            
+            saveAttendanceToCloud(record);
             
             try {
                 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -1050,6 +1174,9 @@
             lucide.createIcons();
         }
 
+        // ----------------------------------------------------------------------
+        // 13. LÓGICA DE CONTROL DE MODALES (LIMPIEZA DE PANTALLA)
+        // ----------------------------------------------------------------------
         btnClearLog.addEventListener('click', () => {
             confirmModal.classList.remove('hidden');
             setTimeout(() => {
@@ -1074,105 +1201,218 @@
 
         btnCancelClear.addEventListener('click', closeModal);
 
-        btnConfirmClear.addEventListener('click', () => {
+        btnConfirmClear.addEventListener('click', async () => {
+            showToast("Limpiando marcas de hoy de la pantalla...", "info");
+
+            if (currentUser && isFirebaseActive) {
+                try {
+                    const todayStr = new Date().toDateString();
+                    const logsRef = collection(db, 'artifacts', appId, 'users', currentUser.uid, 'attendanceLogs');
+                    
+                    // Solo borramos las marcas correspondientes a HOY para no perder el registro histórico general
+                    const snapshot = await getDocs(logsRef);
+                    const promises = [];
+                    snapshot.forEach(docSnap => {
+                        const data = docSnap.data();
+                        if (data.dateStr === todayStr) {
+                            promises.push(deleteDoc(doc(db, 'artifacts', appId, 'users', currentUser.uid, 'attendanceLogs', docSnap.id)));
+                        }
+                    });
+                    await Promise.all(promises);
+                } catch (error) {
+                    console.error("Error al borrar marcas:", error);
+                    showToast("Fallo al sincronizar eliminación con la nube.", "error");
+                }
+            }
+
             attendanceData = [];
             attendanceLogContainer.innerHTML = `<div class="text-center text-xs text-slate-500 py-8" id="emptyLogMsg">No se registran marcas de ingreso.</div>`;
             totalAttendanceDisplay.innerText = "0";
             
-            for (let key in lastSeen) {
-                delete lastSeen[key]; 
-            }
-            for (let key in loggedToday) {
-                delete loggedToday[key]; 
-            }
+            for (let key in lastSeen) delete lastSeen[key];
+            for (let key in loggedToday) delete loggedToday[key];
             
-            showToast("Bitácora de asistencia reiniciada.", "info");
+            showToast("Marcas del día de hoy limpiadas.", "info");
             closeModal();
         });
 
-        btnExport.addEventListener('click', () => {
-            if (attendanceData.length === 0) {
-                showToast("No hay marcas registradas para exportar.", "info");
+        // ----------------------------------------------------------------------
+        // 14. EXPORTACIÓN DE REPORTES HISTÓRICOS (DIARIO, SEMANAL, MENSUAL, ANUAL)
+        // ----------------------------------------------------------------------
+        function openReportModal() {
+            reportModal.classList.remove('hidden');
+            setTimeout(() => {
+                reportModal.classList.remove('opacity-0');
+                reportModal.classList.add('opacity-100');
+                reportModal.classList.add('pointer-events-auto');
+                reportModalBox.classList.remove('scale-95');
+                reportModalBox.classList.add('scale-100');
+            }, 10);
+        }
+
+        function closeReportModalFunc() {
+            reportModal.classList.remove('opacity-100');
+            reportModal.classList.add('opacity-0');
+            reportModal.classList.remove('pointer-events-auto');
+            reportModalBox.classList.remove('scale-100');
+            reportModalBox.classList.add('scale-95');
+            setTimeout(() => {
+                reportModal.classList.add('hidden');
+            }, 300);
+        }
+
+        btnOpenReportModal.addEventListener('click', openReportModal);
+        btnCloseReportModal.addEventListener('click', closeReportModalFunc);
+        btnCancelReport.addEventListener('click', closeReportModalFunc);
+
+        btnGenerateReport.addEventListener('click', async () => {
+            if (!currentUser || !isFirebaseActive) {
+                showToast("Conexión inactiva. No se pueden descargar reportes históricos.", "error");
                 return;
             }
 
-            const dateStr = new Date().toLocaleDateString();
-            
-            let excelHtml = `
-            <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
-            <head>
-                <meta charset="utf-8">
-                <!--[if gte mso 9]>
-                <xml>
-                    <x:ExcelWorkbook>
-                        <x:ExcelWorksheets>
-                            <x:ExcelWorksheet>
-                                <x:Name>Control de Asistencia</x:Name>
-                                <x:WorksheetOptions>
-                                    <x:DisplayGridlines/>
-                                </x:WorksheetOptions>
-                            </x:ExcelWorksheet>
-                        </x:ExcelWorksheets>
-                    </x:ExcelWorkbook>
-                </xml>
-                <![endif]-->
-                <style>
-                    table { border-collapse: collapse; font-family: Arial, sans-serif; }
-                    th { background-color: #0f172a; color: #ffffff; font-weight: bold; padding: 10px; border: 1px solid #334155; }
-                    td { padding: 10px; border: 1px solid #cbd5e1; }
-                    .header-title { font-size: 16px; font-weight: bold; padding-bottom: 12px; color: #0f172a; }
-                    .metadata { font-size: 11px; color: #64748b; padding-bottom: 20px; }
-                </style>
-            </head>
-            <body>
-                <div class="header-title">Reporte de Asistencia Biométrica - BioAccess PRO</div>
-                <div class="metadata">Generado el: ${dateStr} | Total registros: ${attendanceData.length}</div>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Nombre Completo</th>
-                            <th>Categoría o Curso</th>
-                            <th>Tipo de Rol</th>
-                            <th>Fecha</th>
-                            <th>Hora de Ingreso</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-            `;
+            btnGenerateReport.disabled = true;
+            btnGenerateReport.innerHTML = '<i data-lucide="loader-2" class="w-3.5 h-3.5 animate-spin"></i> Procesando...';
+            lucide.createIcons();
 
-            attendanceData.forEach(record => {
-                const cat = getCategoryDetails(record.role);
-                excelHtml += `
-                    <tr>
-                        <td style="font-weight: bold;">${record.name}</td>
-                        <td style="background-color: ${cat.hexBg}; color: ${cat.hexText}; font-weight: bold; border: 1px solid #94a3b8;">${record.role}</td>
-                        <td style="background-color: ${cat.hexBg}; color: ${cat.hexText}; text-transform: uppercase; font-size: 9px; font-weight: bold; border: 1px solid #94a3b8;">${cat.name}</td>
-                        <td>${dateStr}</td>
-                        <td style="font-family: monospace;">${record.time}</td>
-                    </tr>
+            try {
+                const logsRef = collection(db, 'artifacts', appId, 'users', currentUser.uid, 'attendanceLogs');
+                
+                // Obtenemos todo el histórico y filtramos localmente en memoria (REGLA 2)
+                const snapshot = await getDocs(logsRef);
+                const allRecords = [];
+                
+                snapshot.forEach(docSnap => {
+                    allRecords.push(docSnap.data());
+                });
+
+                // Ordenamos del más antiguo al más reciente
+                allRecords.sort((a, b) => a.timestamp - b.timestamp);
+
+                const selectedPeriod = reportPeriodSelect.value;
+                const now = new Date();
+                let filteredRecords = [];
+                let reportTitle = "";
+
+                // Calculamos fechas límite para filtrar
+                const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+                const startOfThisWeek = startOfToday - (7 * 24 * 60 * 60 * 1000);
+                const startOfThisMonth = new Date(now.getFullYear(), now.getMonth(), 1).getTime();
+                const startOfThisYear = new Date(now.getFullYear(), 0, 1).getTime();
+
+                if (selectedPeriod === 'today') {
+                    filteredRecords = allRecords.filter(r => r.timestamp >= startOfToday);
+                    reportTitle = "REPORTE DIARIO DE INGRESO";
+                } else if (selectedPeriod === 'week') {
+                    filteredRecords = allRecords.filter(r => r.timestamp >= startOfThisWeek);
+                    reportTitle = "REPORTE SEMANAL DE INGRESO (Últimos 7 días)";
+                } else if (selectedPeriod === 'month') {
+                    filteredRecords = allRecords.filter(r => r.timestamp >= startOfThisMonth);
+                    reportTitle = `REPORTE MENSUAL DE INGRESO (${now.toLocaleString('es-ES', { month: 'long' }).toUpperCase()})`;
+                } else if (selectedPeriod === 'year') {
+                    filteredRecords = allRecords.filter(r => r.timestamp >= startOfThisYear);
+                    reportTitle = `REPORTE ANUAL DE INGRESO (${now.getFullYear()})`;
+                } else {
+                    filteredRecords = allRecords;
+                    reportTitle = "REPORTE DE ASISTENCIA HISTÓRICO COMPLETO";
+                }
+
+                if (filteredRecords.length === 0) {
+                    showToast("No existen registros guardados para el rango de tiempo seleccionado.", "info");
+                    btnGenerateReport.disabled = false;
+                    btnGenerateReport.innerHTML = '<i data-lucide="download" class="w-3.5 h-3.5"></i> Generar y Descargar Excel';
+                    lucide.createIcons();
+                    return;
+                }
+
+                const dateStr = now.toLocaleDateString();
+                
+                let excelHtml = `
+                <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
+                <head>
+                    <meta charset="utf-8">
+                    <!--[if gte mso 9]>
+                    <xml>
+                        <x:ExcelWorkbook>
+                            <x:ExcelWorksheets>
+                                <x:ExcelWorksheet>
+                                    <x:Name>Control de Asistencia</x:Name>
+                                    <x:WorksheetOptions>
+                                        <x:DisplayGridlines/>
+                                    </x:WorksheetOptions>
+                                </x:ExcelWorksheet>
+                            </x:ExcelWorksheets>
+                        </x:ExcelWorkbook>
+                    </xml>
+                    <![endif]-->
+                    <style>
+                        table { border-collapse: collapse; font-family: Arial, sans-serif; }
+                        th { background-color: #0f172a; color: #ffffff; font-weight: bold; padding: 10px; border: 1px solid #334155; }
+                        td { padding: 10px; border: 1px solid #cbd5e1; }
+                        .header-title { font-size: 16px; font-weight: bold; padding-bottom: 8px; color: #0891b2; text-transform: uppercase; }
+                        .metadata { font-size: 11px; color: #64748b; padding-bottom: 20px; }
+                    </style>
+                </head>
+                <body>
+                    <div class="header-title">${reportTitle} - BIOACCESS PRO</div>
+                    <div class="metadata">Generado el: ${dateStr} | Total registros en el rango: ${filteredRecords.length} | Responsable: Nasslo Muñoz</div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Nombre Completo</th>
+                                <th>Fecha Registro</th>
+                                <th>Hora Ingreso</th>
+                                <th>Categoría o Curso</th>
+                                <th>Rol Clasificación</th>
+                            </tr>
+                        </thead>
+                        <tbody>
                 `;
-            });
 
-            excelHtml += `
-                    </tbody>
-                </table>
-            </body>
-            </html>
-            `;
+                filteredRecords.forEach(record => {
+                    const cat = getCategoryDetails(record.role);
+                    const formattedDate = new Date(record.timestamp).toLocaleDateString('es-ES');
+                    excelHtml += `
+                        <tr>
+                            <td style="font-weight: bold;">${record.name}</td>
+                            <td>${formattedDate}</td>
+                            <td style="font-family: monospace;">${record.time}</td>
+                            <td style="background-color: ${cat.hexBg}; color: ${cat.hexText}; font-weight: bold; border: 1px solid #94a3b8;">${record.role}</td>
+                            <td style="background-color: ${cat.hexBg}; color: ${cat.hexText}; text-transform: uppercase; font-size: 9px; font-weight: bold; border: 1px solid #94a3b8;">${cat.name}</td>
+                        </tr>
+                    `;
+                });
 
-            const blob = new Blob([excelHtml], { type: 'application/vnd.ms-excel;charset=utf-8;' });
-            const url = URL.createObjectURL(blob);
-            
-            const link = document.createElement("a");
-            link.setAttribute("href", url);
-            const fileNameDate = new Date().toISOString().split('T')[0];
-            link.setAttribute("download", `Marcas_Biometricas_${fileNameDate}.xls`);
-            
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            
-            showToast("Planilla Excel coloreada exportada exitosamente.", "success");
+                excelHtml += `
+                        </tbody>
+                    </table>
+                </body>
+                </html>
+                `;
+
+                const blob = new Blob([excelHtml], { type: 'application/vnd.ms-excel;charset=utf-8;' });
+                const url = URL.createObjectURL(blob);
+                
+                const link = document.createElement("a");
+                link.setAttribute("href", url);
+                const fileNameDate = new Date().toISOString().split('T')[0];
+                link.setAttribute("download", `Reporte_BioAccess_${selectedPeriod}_${fileNameDate}.xls`);
+                
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                
+                showToast(`Reporte ${selectedPeriod} exportado exitosamente.`, "success");
+                closeReportModalFunc();
+
+            } catch (error) {
+                console.error("Error al procesar reporte:", error);
+                showToast("Fallo al generar el archivo Excel.", "error");
+            } finally {
+                btnGenerateReport.disabled = false;
+                btnGenerateReport.innerHTML = '<i data-lucide="download" class="w-3.5 h-3.5"></i> Generar y Descargar Excel';
+                lucide.createIcons();
+            }
         });
 
         function showToast(message, type = 'success') {
@@ -1213,12 +1453,11 @@
         }
 
         // ----------------------------------------------------------------------
-        // 13. INICIO Y ARRANQUE GENERAL DEL SISTEMA
+        // 15. INICIO Y ARRANQUE GENERAL DEL SISTEMA
         // ----------------------------------------------------------------------
         async function init() {
             lucide.createIcons();
             
-            // Inicializar por defecto la pestaña del escáner en teléfonos y tablets
             if (window.innerWidth < 1024) {
                 switchTab('scanner');
             }
