@@ -2,10 +2,10 @@
 <html lang="es" class="h-full">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>BioAccess PRO - Control de Asistencia Biométrico</title>
     
-    <!-- Tailwind CSS para diseño -->
+    <!-- Tailwind CSS para diseño fluido y adaptativo -->
     <script src="https://cdn.tailwindcss.com"></script>
     
     <!-- Iconos Lucide -->
@@ -33,7 +33,7 @@
 <body class="bg-slate-950 text-slate-100 font-sans h-full flex flex-col overflow-hidden relative selection:bg-cyan-500/30">
 
     <!-- Contenedor de Notificaciones -->
-    <div id="toastContainer" class="fixed top-20 right-6 z-50 flex flex-col gap-3 w-80 pointer-events-none"></div>
+    <div id="toastContainer" class="fixed top-20 right-6 z-50 flex flex-col gap-3 w-80 max-w-[calc(100vw-3rem)] pointer-events-none"></div>
 
     <!-- Modal de Confirmación Personalizado para Limpieza -->
     <div id="confirmModal" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 flex items-center justify-center hidden opacity-0 transition-opacity duration-300 pointer-events-none">
@@ -58,37 +58,37 @@
         </div>
     </div>
 
-    <!-- Encabezado Principal -->
-    <header class="bg-slate-900 border-b border-slate-800 px-6 py-4 flex flex-wrap justify-between items-center gap-4 shrink-0 shadow-md z-10">
-        <div class="flex items-center gap-3">
+    <!-- Encabezado Principal (Responsive Wrap) -->
+    <header class="bg-slate-900 border-b border-slate-800 px-4 md:px-6 py-3 md:py-4 flex flex-col sm:flex-row justify-between items-center gap-3 shrink-0 shadow-md z-10">
+        <div class="flex items-center gap-3 w-full sm:w-auto">
             <div class="bg-cyan-500/10 p-2 rounded-lg border border-cyan-500/20 text-cyan-400">
                 <i data-lucide="scan-face" class="w-6 h-6 animate-pulse"></i>
             </div>
             <div>
-                <h1 class="text-lg font-bold tracking-tight flex items-center gap-2">
-                    BioAccess <span class="text-xs bg-cyan-500/20 text-cyan-400 px-2 py-0.5 rounded border border-cyan-500/30">PRO</span>
+                <h1 class="text-base md:text-lg font-bold tracking-tight flex items-center gap-2">
+                    BioAccess <span class="text-[10px] bg-cyan-500/20 text-cyan-400 px-2 py-0.5 rounded border border-cyan-500/30">PRO</span>
                 </h1>
-                <p class="text-xs text-slate-400">Control Dual de Asistencia Biométrica</p>
+                <p class="text-[10px] md:text-xs text-slate-400">Control Dual de Asistencia Biométrica</p>
             </div>
         </div>
         
-        <div class="flex items-center gap-3">
-            <div id="cloudStatus" class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-800 border border-slate-700 text-slate-400 text-xs font-medium">
-                <i data-lucide="cloud-off" class="w-4 h-4"></i>
+        <div class="flex items-center justify-between sm:justify-end gap-3 w-full sm:w-auto border-t border-slate-800/60 sm:border-0 pt-2 sm:pt-0">
+            <div id="cloudStatus" class="flex items-center gap-2 px-2.5 py-1 rounded-full bg-slate-800 border border-slate-700 text-slate-400 text-[10px] md:text-xs font-medium">
+                <i data-lucide="cloud-off" class="w-3.5 h-3.5"></i>
                 <span>Nube inactiva</span>
             </div>
-            <div id="statusIndicator" class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-medium">
-                <i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i>
-                <span id="statusText">Cargando Inteligencia Artificial...</span>
+            <div id="statusIndicator" class="flex items-center gap-2 px-2.5 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-[10px] md:text-xs font-medium">
+                <i data-lucide="loader-2" class="w-3.5 h-3.5 animate-spin"></i>
+                <span id="statusText">Iniciando IA...</span>
             </div>
         </div>
     </header>
 
-    <!-- Contenido Principal Split -->
-    <main class="flex-1 flex flex-col lg:flex-row overflow-hidden">
+    <!-- Contenido Principal Split (Con control de visibilidad responsive) -->
+    <main class="flex-1 flex flex-col lg:flex-row overflow-hidden relative">
         
         <!-- PANEL IZQUIERDO: REGISTRO DE PERSONAS -->
-        <section class="w-full lg:w-[320px] bg-slate-900 border-r border-slate-800 flex flex-col shrink-0 z-10 shadow-lg">
+        <section id="panelRegister" class="w-full lg:w-[320px] bg-slate-900 border-r border-slate-800 flex flex-col shrink-0 z-10 shadow-lg lg:flex hidden">
             <div class="p-5 border-b border-slate-800 bg-slate-900/50">
                 <h2 class="text-sm font-semibold uppercase tracking-wider text-slate-300 mb-4 flex items-center gap-2">
                     <i data-lucide="user-plus" class="w-4 h-4 text-emerald-400"></i> Registrar Persona
@@ -148,42 +148,42 @@
         </section>
 
         <!-- ÁREA CENTRAL: PANEL DE ESCÁNER GIGANTE CON MINI REGISTRO FLOTANTE (PiP) -->
-        <section class="flex-1 bg-slate-950 flex flex-col p-4 md:p-6 justify-center items-center overflow-hidden">
+        <section id="panelScanner" class="flex-1 bg-slate-950 flex flex-col p-3 md:p-6 justify-center items-center overflow-hidden transition-all duration-300 lg:flex">
             
-            <!-- CONTENEDOR BASE GIGANTE (Muestra el Escáner de Acceso) -->
-            <div class="relative w-full h-full max-w-4xl aspect-[4/3] bg-black rounded-3xl overflow-hidden shadow-2xl border border-slate-800/80 flex items-center justify-center group">
+            <!-- CONTENEDOR BASE DE CÁMARA (Responsive Aspect Ratio) -->
+            <div class="relative w-full h-full max-w-4xl aspect-[4/3] bg-black rounded-2xl md:rounded-3xl overflow-hidden shadow-2xl border border-slate-800/80 flex items-center justify-center group">
                 
                 <!-- Video y Canvas del Escáner (Cámara 2) ocupando todo el fondo -->
                 <video id="webcamScan" class="absolute inset-0 w-full h-full object-cover" autoplay playsinline muted></video>
                 <canvas id="overlayCanvasScan" class="absolute inset-0 w-full h-full object-cover pointer-events-none z-10"></canvas>
                 
                 <!-- Efecto HUD para el Escáner -->
-                <div class="absolute inset-0 pointer-events-none border-[3px] border-transparent group-hover:border-emerald-500/20 transition-colors rounded-3xl z-20"></div>
+                <div class="absolute inset-0 pointer-events-none border-[3px] border-transparent group-hover:border-emerald-500/20 transition-colors rounded-2xl md:rounded-3xl z-20"></div>
                 
-                <div id="videoPlaceholderScan" class="absolute flex flex-col items-center justify-center text-slate-500 z-0">
-                    <i data-lucide="video-off" class="w-10 h-10 mb-2 opacity-50 animate-pulse"></i>
-                    <span class="text-xs">Iniciando dispositivo de acceso...</span>
+                <div id="videoPlaceholderScan" class="absolute flex flex-col items-center justify-center text-slate-500 z-0 p-4 text-center">
+                    <i data-lucide="video-off" class="w-8 h-8 md:w-10 md:h-10 mb-2 opacity-50 animate-pulse"></i>
+                    <span class="text-[10px] md:text-xs">Iniciando dispositivo de acceso...</span>
                 </div>
 
                 <!-- Cabecera flotante para Cámara 2 (Escáner) -->
-                <div class="absolute top-4 right-4 bg-slate-900/90 backdrop-blur-md border border-slate-800/80 px-3 py-1.5 rounded-xl z-20 flex items-center gap-3 shadow-lg">
-                    <div class="flex items-center gap-1.5">
-                        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
-                        <span class="text-xs font-bold text-slate-200 uppercase tracking-wider">Cámara 2: Escáner</span>
+                <div class="absolute top-3 right-3 bg-slate-900/90 backdrop-blur-md border border-slate-800/80 px-2.5 py-1 md:py-1.5 rounded-xl z-20 flex items-center gap-2 md:gap-3 shadow-lg">
+                    <div class="flex items-center gap-1.5 shrink-0">
+                        <span class="w-1.5 h-1.5 md:w-2 md:h-2 rounded-full bg-emerald-400 animate-ping"></span>
+                        <span class="text-[9px] md:text-xs font-bold text-slate-200 uppercase tracking-wider">Cámara 2</span>
                     </div>
-                    <select id="cameraScanSelect" class="bg-slate-950 border border-slate-800 rounded-lg px-2 py-1 text-[11px] text-slate-300 focus:outline-none focus:ring-1 focus:ring-emerald-500 max-w-[150px]">
+                    <select id="cameraScanSelect" class="bg-slate-950 border border-slate-800 rounded-lg px-1.5 py-0.5 text-[9px] md:text-[11px] text-slate-300 focus:outline-none focus:ring-1 focus:ring-emerald-500 max-w-[100px] md:max-w-[150px]">
                         <option value="">Cargando...</option>
                     </select>
                 </div>
 
-                <!-- MINI VENTANA FLOTANTE: CÁMARA 1 (REGISTRO) -->
-                <div class="absolute top-4 left-4 w-44 sm:w-56 bg-slate-900/95 backdrop-blur-md border border-slate-700/60 rounded-2xl p-2.5 shadow-2xl z-30 flex flex-col gap-2 transition-all hover:scale-[1.02]">
+                <!-- MINI VENTANA FLOTANTE: CÁMARA 1 (REGISTRO ENROLADO) -->
+                <div class="absolute top-3 left-3 w-28 sm:w-44 md:w-56 bg-slate-900/95 backdrop-blur-md border border-slate-700/60 rounded-xl md:rounded-2xl p-1.5 md:p-2.5 shadow-2xl z-30 flex flex-col gap-1.5 md:gap-2 transition-all hover:scale-[1.02]">
                     <div class="flex items-center justify-between gap-1">
                         <div class="flex items-center gap-1 shrink-0">
-                            <span class="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse"></span>
-                            <span class="text-[10px] font-bold text-slate-300 uppercase tracking-wide">Cámara 1: Registro</span>
+                            <span class="w-1 h-1 md:w-1.5 md:h-1.5 rounded-full bg-cyan-400 animate-pulse"></span>
+                            <span class="text-[8px] md:text-[10px] font-bold text-slate-300 uppercase tracking-wide">Cámara 1</span>
                         </div>
-                        <select id="cameraRegSelect" class="bg-slate-950 border border-slate-800 rounded-lg px-1.5 py-0.5 text-[10px] text-slate-300 focus:outline-none focus:ring-1 focus:ring-cyan-500 max-w-[90px] sm:max-w-[110px]">
+                        <select id="cameraRegSelect" class="bg-slate-950 border border-slate-800 rounded-lg px-1 py-0.5 text-[8px] md:text-[10px] text-slate-300 focus:outline-none focus:ring-1 focus:ring-cyan-500 max-w-[50px] sm:max-w-[110px]">
                             <option value="">Cargando...</option>
                         </select>
                     </div>
@@ -194,33 +194,34 @@
                         <canvas id="overlayCanvasReg" class="absolute inset-0 w-full h-full object-cover pointer-events-none z-10"></canvas>
                         
                         <div id="videoPlaceholderReg" class="absolute flex flex-col items-center justify-center text-slate-600 z-0 text-center p-1">
-                            <i data-lucide="video-off" class="w-5 h-5 mb-1 opacity-50"></i>
-                            <span class="text-[8px]">Iniciando...</span>
+                            <i data-lucide="video-off" class="w-4 h-4 mb-1 opacity-50"></i>
+                            <span class="text-[7px]">Iniciando...</span>
                         </div>
                     </div>
                 </div>
 
             </div>
 
-            <div class="w-full max-w-4xl flex justify-between text-[11px] text-slate-500 px-2 mt-3 shrink-0">
-                <span>Precisión biométrica calibrada al: <span class="font-mono text-cyan-400">50% (Dist: 0.50)</span></span>
-                <span>Procesamiento descentralizado local simultáneo</span>
+            <!-- Información técnica inferior -->
+            <div class="w-full max-w-4xl flex justify-between text-[9px] md:text-[11px] text-slate-500 px-2 mt-3 shrink-0">
+                <span>Calibración: <span class="font-mono text-cyan-400">50% (Dist: 0.50)</span></span>
+                <span>Procesamiento local simultáneo</span>
             </div>
         </section>
 
         <!-- PANEL DERECHO: REPORTE DE ASISTENCIA -->
-        <section class="w-full lg:w-[320px] bg-slate-900 border-l border-slate-800 flex flex-col shrink-0 z-10 shadow-lg">
+        <section id="panelAttendance" class="w-full lg:w-[320px] bg-slate-900 border-l border-slate-800 flex flex-col shrink-0 z-10 shadow-lg lg:flex hidden">
             
             <div class="p-5 border-b border-slate-800 flex justify-between items-center bg-slate-900/50">
                 <h2 class="text-sm font-semibold uppercase tracking-wider text-slate-300 flex items-center gap-2">
                     <i data-lucide="clipboard-list" class="w-4 h-4 text-cyan-400"></i> Ingresos del Día
                 </h2>
-                <button id="btnClearLog" class="text-xs text-slate-400 hover:text-rose-400 transition" title="Limpiar marcas de hoy">
-                    <i data-lucide="trash-2" class="w-4.5 h-4.5"></i>
+                <button id="btnClearLog" class="text-slate-400 hover:text-rose-400 transition p-1 rounded-lg hover:bg-slate-800" title="Limpiar marcas de hoy">
+                    <i data-lucide="trash-2" class="w-4 h-4"></i>
                 </button>
             </div>
 
-            <!-- Panel de Control de Duplicados (Reportar Siempre) -->
+            <!-- Panel de Control de Duplicados -->
             <div class="px-5 py-3 border-b border-slate-800 bg-slate-950/40 flex items-center justify-between text-xs text-slate-400 shrink-0">
                 <label class="flex items-center gap-2.5 cursor-pointer hover:text-slate-200 transition select-none">
                     <input type="checkbox" id="chkReportAlways" class="rounded border-slate-700 bg-slate-950 text-cyan-500 focus:ring-cyan-500 focus:ring-offset-slate-900 w-4 h-4 transition">
@@ -251,12 +252,28 @@
         </section>
     </main>
 
+    <!-- BARRA DE NAVEGACIÓN MÓVIL (Solo visible en pantallas < lg) -->
+    <nav id="mobileNav" class="lg:hidden bg-slate-900 border-t border-slate-800 px-2 py-1.5 flex justify-around items-center shrink-0 z-30 shadow-2xl">
+        <button id="tabRegister" class="flex flex-col items-center gap-1 text-slate-400 hover:text-cyan-400 transition py-1.5 px-3 rounded-xl min-w-[70px]">
+            <i data-lucide="user-plus" class="w-5 h-5"></i>
+            <span class="text-[9px] font-bold">Registro</span>
+        </button>
+        <button id="tabScanner" class="flex flex-col items-center gap-1 text-cyan-400 hover:text-cyan-400 transition py-1.5 px-3 rounded-xl bg-slate-800/50 min-w-[70px]">
+            <i data-lucide="scan-face" class="w-5 h-5"></i>
+            <span class="text-[9px] font-bold">Escáner</span>
+        </button>
+        <button id="tabAttendance" class="flex flex-col items-center gap-1 text-slate-400 hover:text-cyan-400 transition py-1.5 px-3 rounded-xl min-w-[70px]">
+            <i data-lucide="clipboard-list" class="w-5 h-5"></i>
+            <span class="text-[9px] font-bold">Ingresos</span>
+        </button>
+    </nav>
+
     <!-- FIRMA DE AUTOR (100% visible) -->
-    <div class="fixed bottom-4 right-4 md:bottom-6 md:right-8 opacity-95 z-50 print:hidden pointer-events-none select-none">
+    <div class="fixed bottom-16 lg:bottom-6 right-4 md:right-8 opacity-95 z-40 print:hidden pointer-events-none select-none">
         <div class="flex flex-col items-end">
-            <span class="text-[0.65rem] text-gray-400 uppercase tracking-widest font-sans mb-[-4px]">Creada por</span>
-            <span class="text-2xl text-gray-200" style="font-family: 'Brush Script MT', 'Lucida Handwriting', 'Great Vibes', cursive;">Nasslo Muñoz</span>
-            <span class="text-[0.6rem] text-blue-400 font-sans tracking-widest uppercase mt-1">Ingeniero Informático</span>
+            <span class="text-[0.55rem] md:text-[0.65rem] text-gray-400 uppercase tracking-widest font-sans mb-[-4px]">Creada por</span>
+            <span class="text-xl md:text-2xl text-gray-200" style="font-family: 'Brush Script MT', 'Lucida Handwriting', 'Great Vibes', cursive;">Nasslo Muñoz</span>
+            <span class="text-[0.5rem] md:text-[0.6rem] text-blue-400 font-sans tracking-widest uppercase mt-1">Ingeniero Informático</span>
         </div>
     </div>
 
@@ -310,6 +327,15 @@
         const btnCancelClear = document.getElementById('btnCancelClear');
         const btnConfirmClear = document.getElementById('btnConfirmClear');
 
+        // Referencias del sistema responsivo de pestañas
+        const tabRegister = document.getElementById('tabRegister');
+        const tabScanner = document.getElementById('tabScanner');
+        const tabAttendance = document.getElementById('tabAttendance');
+
+        const panelRegister = document.getElementById('panelRegister');
+        const panelScanner = document.getElementById('panelScanner');
+        const panelAttendance = document.getElementById('panelAttendance');
+
         // ----------------------------------------------------------------------
         // 3. VARIABLES DE ESTADO GLOBAL
         // ----------------------------------------------------------------------
@@ -335,7 +361,86 @@
         let isFirebaseActive = false;
 
         // ----------------------------------------------------------------------
-        // 3.5 UTILIDAD DE CONFIGURACIÓN DE COLORES POR CATEGORÍA
+        // 4. LÓGICA DE CONTROL DE PESTAÑAS RESPONSIVO (MÓVIL / TABLET)
+        // ----------------------------------------------------------------------
+        function switchTab(activeTab) {
+            // Resetear estilos visuales de los botones de navegación
+            [tabRegister, tabScanner, tabAttendance].forEach(t => {
+                t.classList.remove('text-cyan-400', 'bg-slate-800/50');
+                t.classList.add('text-slate-400');
+            });
+
+            // Ocultar todos los paneles para la vista móvil
+            panelRegister.classList.add('hidden');
+            panelRegister.classList.remove('flex');
+            panelScanner.classList.add('hidden');
+            panelScanner.classList.remove('flex');
+            panelAttendance.classList.add('hidden');
+            panelAttendance.classList.remove('flex');
+
+            // Mostrar el panel seleccionado aplicando flexbox dinámico
+            if (activeTab === 'register') {
+                tabRegister.classList.add('text-cyan-400', 'bg-slate-800/50');
+                tabRegister.classList.remove('text-slate-400');
+                panelRegister.classList.remove('hidden');
+                panelRegister.classList.add('flex');
+            } else if (activeTab === 'scanner') {
+                tabScanner.classList.add('text-cyan-400', 'bg-slate-800/50');
+                tabScanner.classList.remove('text-slate-400');
+                panelScanner.classList.remove('hidden');
+                panelScanner.classList.add('flex');
+                
+                // Forzar sincronización de dimensiones al activar la cámara del escáner
+                setTimeout(() => {
+                    if (videoScan && videoScan.readyState === 4) {
+                        displaySizeScan = { width: videoScan.videoWidth, height: videoScan.videoHeight };
+                        faceapi.matchDimensions(canvasScan, displaySizeScan);
+                    }
+                }, 150);
+            } else if (activeTab === 'attendance') {
+                tabAttendance.classList.add('text-cyan-400', 'bg-slate-800/50');
+                tabAttendance.classList.remove('text-slate-400');
+                panelAttendance.classList.remove('hidden');
+                panelAttendance.classList.add('flex');
+            }
+        }
+
+        // Asignar listeners táctiles y de clicks a los botones de navegación móvil
+        tabRegister.addEventListener('click', () => switchTab('register'));
+        tabScanner.addEventListener('click', () => switchTab('scanner'));
+        tabAttendance.addEventListener('click', () => switchTab('attendance'));
+
+        // Controlar el redimensionamiento dinámico de la ventana (Rotar pantalla / cambiar tamaño)
+        window.addEventListener('resize', () => {
+            if (window.innerWidth >= 1024) {
+                // En computadoras de escritorio, volver a forzar la visualización conjunta de los 3 paneles
+                panelRegister.classList.remove('hidden');
+                panelRegister.classList.add('flex');
+                panelScanner.classList.remove('hidden');
+                panelScanner.classList.add('flex');
+                panelAttendance.classList.remove('hidden');
+                panelAttendance.classList.add('flex');
+            } else {
+                // En móviles, restaurar el panel activo seleccionado
+                const activeBtn = [tabRegister, tabScanner, tabAttendance].find(t => t.classList.contains('text-cyan-400'));
+                if (activeBtn === tabRegister) switchTab('register');
+                else if (activeBtn === tabAttendance) switchTab('attendance');
+                else switchTab('scanner');
+            }
+
+            // Actualizar dimensiones de capas de rastreo biométrico
+            if (videoReg && videoReg.readyState === 4) {
+                displaySizeReg = { width: videoReg.videoWidth, height: videoReg.videoHeight };
+                faceapi.matchDimensions(canvasReg, displaySizeReg);
+            }
+            if (videoScan && videoScan.readyState === 4) {
+                displaySizeScan = { width: videoScan.videoWidth, height: videoScan.videoHeight };
+                faceapi.matchDimensions(canvasScan, displaySizeScan);
+            }
+        });
+
+        // ----------------------------------------------------------------------
+        // 5. UTILIDAD DE CONFIGURACIÓN DE COLORES POR CATEGORÍA
         // ----------------------------------------------------------------------
         function getCategoryDetails(role) {
             const r = (role || '').toLowerCase();
@@ -398,11 +503,10 @@
         }
 
         // ----------------------------------------------------------------------
-        // 4. INICIALIZACIÓN Y CONFIGURACIÓN DE FIREBASE (NUBE)
+        // 6. INICIALIZACIÓN Y CONFIGURACIÓN DE FIREBASE (NUBE)
         // ----------------------------------------------------------------------
         async function initFirebase() {
             try {
-                // Tus credenciales reales pre-configuradas y listas para publicar en GitHub
                 const miConfiguracionFirebase = {
                     apiKey: "AIzaSyCis4BnaT4Pg4fj-AjvrGQwkNNxybOtKFE",
                     authDomain: "asistencia-biometrica-tren.firebaseapp.com",
@@ -448,13 +552,13 @@
         }
 
         function setCloudStatus(text, icon, colorClass, bgClass) {
-            cloudStatus.className = `flex items-center gap-2 px-3 py-1.5 rounded-full ${bgClass} border border-slate-700/50 ${colorClass} text-xs font-medium`;
-            cloudStatus.innerHTML = `<i data-lucide="${icon}" class="w-4 h-4"></i><span>${text}</span>`;
+            cloudStatus.className = `flex items-center gap-2 px-3 py-1.5 rounded-full ${bgClass} border border-slate-700/50 ${colorClass} text-[10px] md:text-xs font-medium`;
+            cloudStatus.innerHTML = `<i data-lucide="${icon}" class="w-3.5 h-3.5"></i><span>${text}</span>`;
             lucide.createIcons();
         }
 
         // ----------------------------------------------------------------------
-        // 5. OPERACIONES DE LECTURA/ESCRITURA EN FIRESTORE
+        // 7. OPERACIONES DE LECTURA/ESCRITURA EN FIRESTORE
         // ----------------------------------------------------------------------
         async function loadProfilesFromCloud() {
             if (!currentUser || !isFirebaseActive) return;
@@ -516,7 +620,7 @@
         }
 
         // ----------------------------------------------------------------------
-        // 6. GESTIÓN DE CÁMARAS (CONDUCCIÓN DE CONFLICTOS HARDWARE)
+        // 8. GESTIÓN DE CÁMARAS (CONDUCCIÓN DE CONFLICTOS HARDWARE)
         // ----------------------------------------------------------------------
         async function initCameras() {
             try {
@@ -612,7 +716,7 @@
         cameraScanSelect.onchange = () => syncVideoStreams();
 
         // ----------------------------------------------------------------------
-        // 7. CARGA DE MODELOS BIOMÉTRICOS DE FACE-API
+        // 9. CARGA DE MODELOS BIOMÉTRICOS DE FACE-API
         // ----------------------------------------------------------------------
         async function loadModels() {
             const MODEL_URL = 'https://vladmandic.github.io/face-api/model/';
@@ -644,7 +748,7 @@
         }
 
         // ----------------------------------------------------------------------
-        // 8. BUCLE PRINCIPAL DE RECONOCIMIENTO MULTICÁMARA
+        // 10. BUCLE PRINCIPAL DE RECONOCIMIENTO MULTICÁMARA
         // ----------------------------------------------------------------------
         async function recognizeFacesLoop() {
             try {
@@ -741,7 +845,7 @@
         }
 
         // ----------------------------------------------------------------------
-        // 9. LÓGICA DE REGISTRO / ENROLAMIENTO (MÉTODO CAPTURA)
+        // 11. LÓGICA DE REGISTRO / ENROLAMIENTO (MÉTODO CAPTURA)
         // ----------------------------------------------------------------------
         newPersonRoleSelect.addEventListener('change', (e) => {
             const val = e.target.value;
@@ -875,7 +979,7 @@
         }
 
         // ----------------------------------------------------------------------
-        // 10. REGISTRO AUTOMÁTICO DE ASISTENCIA Y COOLDOWNS
+        // 12. REGISTRO AUTOMÁTICO DE ASISTENCIA Y COOLDOWNS
         // ----------------------------------------------------------------------
         function logAttendance(name) {
             const now = Date.now();
@@ -1109,10 +1213,16 @@
         }
 
         // ----------------------------------------------------------------------
-        // 11. INICIO Y ARRANQUE GENERAL DEL SISTEMA
+        // 13. INICIO Y ARRANQUE GENERAL DEL SISTEMA
         // ----------------------------------------------------------------------
         async function init() {
             lucide.createIcons();
+            
+            // Inicializar por defecto la pestaña del escáner en teléfonos y tablets
+            if (window.innerWidth < 1024) {
+                switchTab('scanner');
+            }
+            
             await initFirebase();
             await initCameras();
             await loadModels();
