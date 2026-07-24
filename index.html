@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>BioAccess PRO - Control de Asistencia Biométrico</title>
+    <title>Control de acceso Biométrico Privado</title>
     
     <!-- Tailwind CSS para diseño fluido y adaptativo -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -109,7 +109,7 @@
                 <div class="bg-cyan-500/10 p-3 rounded-2xl border border-cyan-500/20 text-cyan-400 mb-3 glow-cyan">
                     <i data-lucide="shield-check" class="w-8 h-8"></i>
                 </div>
-                <h2 class="text-xl font-bold text-slate-100">BioAccess PRO</h2>
+                <h2 class="text-xl font-bold text-slate-100">Control de acceso Biométrico Privado</h2>
                 <p class="text-xs text-slate-400 mt-1">Acceso restringido - Autenticación requerida</p>
             </div>
 
@@ -135,13 +135,20 @@
                 </div>
 
                 <button type="submit" id="btnLoginSubmit" class="w-full bg-cyan-600 hover:bg-cyan-500 text-white font-bold py-2.5 rounded-xl text-sm transition shadow-lg shadow-cyan-950/30 flex items-center justify-center gap-2">
-                    <i data-lucide="log-in" class="w-4 h-4"></i> Iniciar Sesión
-                </button>
-            </form>
+                <i data-lucide="log-in" class="w-4 h-4"></i> Iniciar Sesión
+            </button>
+        </form>
+
+        <!-- Firma en Login -->
+        <div class="mt-6 pt-4 border-t border-slate-800 flex flex-col items-center pointer-events-none select-none">
+            <span class="text-[0.55rem] text-gray-500 uppercase tracking-widest font-sans mb-[-4px]">Creada por</span>
+            <span class="text-xl text-gray-300" style="font-family: 'Brush Script MT', 'Lucida Handwriting', 'Great Vibes', cursive;">Nasslo Muñoz</span>
+            <span class="text-[0.5rem] text-blue-400/80 font-sans tracking-widest uppercase mt-1">Ingeniero Informático</span>
         </div>
     </div>
+</div>
 
-    <!-- MODAL DE GESTIÓN DE USUARIOS (Solo Administrador) -->
+<!-- MODAL DE GESTIÓN DE USUARIOS (Solo Administrador) -->
     <div id="userMgmtModal" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 flex items-center justify-center hidden opacity-0 transition-opacity duration-300 pointer-events-none">
         <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 max-w-md w-full mx-4 shadow-2xl transform scale-95 transition-all duration-300" id="userMgmtBox">
             <div class="flex items-center justify-between border-b border-slate-800 pb-3 mb-4">
@@ -222,10 +229,10 @@
                 <i data-lucide="scan-face" class="w-6 h-6 animate-pulse"></i>
             </div>
             <div>
-                <h1 class="text-base md:text-lg font-bold tracking-tight flex items-center gap-2">
-                    BioAccess <span class="text-[10px] bg-cyan-500/20 text-cyan-400 px-2 py-0.5 rounded border border-cyan-500/30">PRO</span>
+                <h1 class="text-base md:text-lg font-bold tracking-tight flex items-center gap-2 flex-wrap">
+                    Control de acceso <span class="text-[10px] bg-cyan-500/20 text-cyan-400 px-2 py-0.5 rounded border border-cyan-500/30 whitespace-nowrap">Biométrico Privado</span>
                 </h1>
-                <p class="text-[10px] md:text-xs text-slate-400">Control Dual de Asistencia Biométrico</p>
+                <p class="text-[10px] md:text-xs text-slate-400">Control Dual de Asistencia</p>
             </div>
         </div>
         
@@ -1815,7 +1822,7 @@
                     </style>
                 </head>
                 <body>
-                    <div class="header-title">${reportTitle} - BIOACCESS PRO</div>
+                    <div class="header-title">${reportTitle} - CONTROL DE ACCESO BIOMÉTRICO PRIVADO</div>
                     <div class="metadata">Generado el: ${dateStr} | Total registros en el rango: ${filteredRecords.length} | Responsable: Nasslo Muñoz</div>
                     <table>
                         <thead>
@@ -1860,7 +1867,7 @@
                 const link = document.createElement("a");
                 link.setAttribute("href", url);
                 const fileNameDate = new Date().toISOString().split('T')[0];
-                link.setAttribute("download", `Reporte_BioAccess_${selectedPeriod}_${fileNameDate}.xls`);
+                link.setAttribute("download", `Reporte_ControlAcceso_${selectedPeriod}_${fileNameDate}.xls`);
                 
                 document.body.appendChild(link);
                 link.click();
