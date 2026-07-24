@@ -89,14 +89,128 @@
                 </div>
             </div>
 
-            <div class="flex gap-3 justify-end">
-                <button id="btnCancelReport" class="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-xs font-semibold transition">
-                    Cerrar
+            <div class="flex gap-3 justify-end border-t border-slate-800 pt-4">
+                <button id="btnCancelReport" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-xs font-semibold transition">
+                    Cancelar
                 </button>
-                <button id="btnGenerateReport" class="px-5 py-2.5 bg-cyan-600 hover:bg-cyan-500 text-white rounded-lg text-xs font-bold transition shadow-lg shadow-cyan-950/20 flex items-center gap-2">
-                    <i data-lucide="download" class="w-3.5 h-3.5"></i>
-                    Generar y Descargar Excel
+                <button id="btnGenerateReport" class="px-4 py-2 bg-cyan-600 hover:bg-cyan-500 text-white rounded-lg text-xs font-bold transition flex items-center gap-2 shadow-lg shadow-cyan-950/20">
+                    <i data-lucide="download" class="w-3.5 h-3.5"></i> Generar y Descargar Excel
                 </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL / PANTALLA DE LOGIN DE SEGURIDAD -->
+    <div id="loginModal" class="fixed inset-0 bg-slate-950 z-[100] flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 sm:p-8 max-w-md w-full shadow-2xl relative overflow-hidden">
+            <div class="absolute -top-10 -right-10 w-32 h-32 bg-cyan-500/10 rounded-full blur-2xl pointer-events-none"></div>
+            
+            <div class="flex flex-col items-center text-center mb-6">
+                <div class="bg-cyan-500/10 p-3 rounded-2xl border border-cyan-500/20 text-cyan-400 mb-3 glow-cyan">
+                    <i data-lucide="shield-check" class="w-8 h-8"></i>
+                </div>
+                <h2 class="text-xl font-bold text-slate-100">BioAccess PRO</h2>
+                <p class="text-xs text-slate-400 mt-1">Acceso restringido - Autenticación requerida</p>
+            </div>
+
+            <form id="loginForm" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-medium text-slate-300 mb-1.5">Usuario / Rut</label>
+                    <div class="relative">
+                        <i data-lucide="user" class="w-4 h-4 text-slate-500 absolute left-3 top-3"></i>
+                        <input type="text" id="loginUsername" required placeholder="Ingresa tu usuario" class="w-full bg-slate-950 border border-slate-800 rounded-xl pl-9 pr-3 py-2.5 text-sm text-slate-100 focus:outline-none focus:ring-2 focus:ring-cyan-500 transition">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-medium text-slate-300 mb-1.5">Contraseña</label>
+                    <div class="relative">
+                        <i data-lucide="key-round" class="w-4 h-4 text-slate-500 absolute left-3 top-3"></i>
+                        <input type="password" id="loginPassword" required placeholder="••••••••" class="w-full bg-slate-950 border border-slate-800 rounded-xl pl-9 pr-3 py-2.5 text-sm text-slate-100 focus:outline-none focus:ring-2 focus:ring-cyan-500 transition">
+                    </div>
+                </div>
+
+                <div id="loginErrorMsg" class="hidden text-xs text-rose-400 bg-rose-950/40 border border-rose-800/50 p-2.5 rounded-lg text-center font-medium">
+                    Credenciales incorrectas. Verifica tu usuario y contraseña.
+                </div>
+
+                <button type="submit" id="btnLoginSubmit" class="w-full bg-cyan-600 hover:bg-cyan-500 text-white font-bold py-2.5 rounded-xl text-sm transition shadow-lg shadow-cyan-950/30 flex items-center justify-center gap-2">
+                    <i data-lucide="log-in" class="w-4 h-4"></i> Iniciar Sesión
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL DE GESTIÓN DE USUARIOS (Solo Administrador) -->
+    <div id="userMgmtModal" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 flex items-center justify-center hidden opacity-0 transition-opacity duration-300 pointer-events-none">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 max-w-md w-full mx-4 shadow-2xl transform scale-95 transition-all duration-300" id="userMgmtBox">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3 mb-4">
+                <div class="flex items-center gap-2 text-cyan-400">
+                    <i data-lucide="users" class="w-5 h-5"></i>
+                    <h3 class="text-base font-bold text-slate-200">Gestión de Usuarios Acceso</h3>
+                </div>
+                <button id="btnCloseUserMgmt" class="text-slate-400 hover:text-white transition p-1 rounded-lg hover:bg-slate-800">
+                    <i data-lucide="x" class="w-4 h-4"></i>
+                </button>
+            </div>
+
+            <!-- Formulario para agregar nuevo usuario -->
+            <form id="newUserForm" class="space-y-3 mb-6 bg-slate-950 p-3.5 rounded-xl border border-slate-800">
+                <h4 class="text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">Crear Nuevo Usuario</h4>
+                <div>
+                    <label class="block text-[11px] text-slate-400 mb-1">Nombre de Usuario / Rut</label>
+                    <input type="text" id="newAccUsername" required placeholder="Ej. usuario123" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-200 focus:outline-none focus:ring-1 focus:ring-cyan-500">
+                </div>
+                <div>
+                    <label class="block text-[11px] text-slate-400 mb-1">Contraseña</label>
+                    <input type="password" id="newAccPassword" required placeholder="Clave de acceso" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-200 focus:outline-none focus:ring-1 focus:ring-cyan-500">
+                </div>
+                <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2 rounded-lg text-xs transition flex items-center justify-center gap-1.5">
+                    <i data-lucide="user-plus" class="w-3.5 h-3.5"></i> Asignar Usuario
+                </button>
+            </form>
+
+            <!-- Lista de usuarios autorizados -->
+            <div class="space-y-2">
+                <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Usuarios Registrados</h4>
+                <div id="usersListContainer" class="max-h-40 overflow-y-auto space-y-1.5 pr-1 no-scrollbar">
+                    <!-- Dinámico -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DE GESTIÓN DE DEPENDENCIAS (Solo Administrador) -->
+    <div id="depMgmtModal" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 flex items-center justify-center hidden opacity-0 transition-opacity duration-300 pointer-events-none">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 max-w-md w-full mx-4 shadow-2xl transform scale-95 transition-all duration-300" id="depMgmtBox">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3 mb-4">
+                <div class="flex items-center gap-2 text-purple-400">
+                    <i data-lucide="map-pin" class="w-5 h-5"></i>
+                    <h3 class="text-base font-bold text-slate-200">Gestión de Dependencias</h3>
+                </div>
+                <button id="btnCloseDepMgmt" class="text-slate-400 hover:text-white transition p-1 rounded-lg hover:bg-slate-800">
+                    <i data-lucide="x" class="w-4 h-4"></i>
+                </button>
+            </div>
+            
+            <!-- Formulario para agregar nueva dependencia -->
+            <form id="newDepForm" class="space-y-3 mb-6 bg-slate-950 p-3.5 rounded-xl border border-slate-800">
+                <h4 class="text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">Crear Nueva Dependencia</h4>
+                <div>
+                    <label class="block text-[11px] text-slate-400 mb-1">Nombre del Lugar / Evento</label>
+                    <input type="text" id="newDepName" required placeholder="Ej. Biblioteca, Salida a Terreno..." class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-200 focus:outline-none focus:ring-1 focus:ring-purple-500">
+                </div>
+                <button type="submit" class="w-full bg-purple-600 hover:bg-purple-500 text-white font-bold py-2 rounded-lg text-xs transition flex items-center justify-center gap-1.5">
+                    <i data-lucide="plus-circle" class="w-3.5 h-3.5"></i> Agregar Dependencia
+                </button>
+            </form>
+
+            <!-- Lista de dependencias -->
+            <div class="space-y-2">
+                <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Lugares Registrados</h4>
+                <div id="depListContainer" class="max-h-40 overflow-y-auto space-y-1.5 pr-1 no-scrollbar">
+                    <!-- Dinámico -->
+                </div>
             </div>
         </div>
     </div>
@@ -111,11 +225,39 @@
                 <h1 class="text-base md:text-lg font-bold tracking-tight flex items-center gap-2">
                     BioAccess <span class="text-[10px] bg-cyan-500/20 text-cyan-400 px-2 py-0.5 rounded border border-cyan-500/30">PRO</span>
                 </h1>
-                <p class="text-[10px] md:text-xs text-slate-400">Control Dual de Asistencia Biométrica</p>
+                <p class="text-[10px] md:text-xs text-slate-400">Control Dual de Asistencia Biométrico</p>
             </div>
         </div>
         
-        <div class="flex items-center justify-between sm:justify-end gap-3 w-full sm:w-auto border-t border-slate-800/60 sm:border-0 pt-2 sm:pt-0">
+        <div class="flex items-center justify-between sm:justify-end gap-2 md:gap-3 w-full sm:w-auto border-t border-slate-800/60 sm:border-0 pt-2 sm:pt-0 flex-wrap">
+            <div id="userInfoBadge" class="hidden items-center gap-2 bg-slate-950 border border-slate-800 px-3 py-1 rounded-full text-xs">
+                <span id="activeUserDisplay" class="font-bold text-cyan-400">168434995</span>
+                <span id="adminTag" class="text-[9px] bg-amber-500/20 text-amber-400 border border-amber-500/30 px-1.5 py-0.5 rounded font-bold uppercase">Admin</span>
+            </div>
+
+            <!-- Selector de Dependencia Activa -->
+            <div class="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-950 border border-slate-800 text-xs">
+                <i data-lucide="map-pin" class="w-3.5 h-3.5 text-purple-400"></i>
+                <select id="currentDepSelect" class="bg-transparent text-slate-200 text-[10px] md:text-xs focus:outline-none cursor-pointer font-semibold max-w-[110px] md:max-w-[140px] truncate">
+                    <option value="General" class="bg-slate-900">General</option>
+                </select>
+            </div>
+
+            <button id="btnOpenUserMgmt" class="hidden items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 text-[10px] md:text-xs font-medium border border-slate-700 transition" title="Administrar Usuarios">
+                <i data-lucide="users" class="w-3.5 h-3.5 text-cyan-400"></i>
+                <span class="hidden sm:inline">Usuarios</span>
+            </button>
+
+            <button id="btnOpenDepMgmt" class="hidden items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 text-[10px] md:text-xs font-medium border border-slate-700 transition" title="Administrar Dependencias">
+                <i data-lucide="map-pin" class="w-3.5 h-3.5 text-purple-400"></i>
+                <span class="hidden sm:inline">Lugares</span>
+            </button>
+
+            <button id="btnLogout" class="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-rose-950/40 hover:bg-rose-900/60 text-rose-300 border border-rose-800/40 text-[10px] md:text-xs font-medium transition" title="Cerrar Sesión">
+                <i data-lucide="log-out" class="w-3.5 h-3.5"></i>
+                <span>Salir</span>
+            </button>
+
             <div id="cloudStatus" class="flex items-center gap-2 px-2.5 py-1 rounded-full bg-slate-800 border border-slate-700 text-slate-400 text-[10px] md:text-xs font-medium">
                 <i data-lucide="cloud-off" class="w-3.5 h-3.5"></i>
                 <span>Nube inactiva</span>
@@ -311,7 +453,7 @@
         </button>
     </nav>
 
-    <!-- FIRMA DE AUTOR (100% visible) -->
+    <!-- FIRMA DE AUTOR -->
     <div class="fixed bottom-16 lg:bottom-6 right-4 md:right-8 opacity-95 z-40 print:hidden pointer-events-none select-none">
         <div class="flex flex-col items-end">
             <span class="text-[0.55rem] md:text-[0.65rem] text-gray-400 uppercase tracking-widest font-sans mb-[-4px]">Creada por</span>
@@ -329,7 +471,42 @@
         import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, getDocs, doc, setDoc, query, where, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // ----------------------------------------------------------------------
+        // Credenciales Maestras de Administrador
+        const ADMIN_USER = "168434995";
+        const ADMIN_PASS = "01082017";
+        let activeSessionUser = null;
+
+        // Referencias DOM Login & Usuarios
+        const loginModal = document.getElementById('loginModal');
+        const loginForm = document.getElementById('loginForm');
+        const loginUsername = document.getElementById('loginUsername');
+        const loginPassword = document.getElementById('loginPassword');
+        const loginErrorMsg = document.getElementById('loginErrorMsg');
+        
+        const userInfoBadge = document.getElementById('userInfoBadge');
+        const activeUserDisplay = document.getElementById('activeUserDisplay');
+        const adminTag = document.getElementById('adminTag');
+        const btnOpenUserMgmt = document.getElementById('btnOpenUserMgmt');
+        const btnLogout = document.getElementById('btnLogout');
+
+        const userMgmtModal = document.getElementById('userMgmtModal');
+        const userMgmtBox = document.getElementById('userMgmtBox');
+        const btnCloseUserMgmt = document.getElementById('btnCloseUserMgmt');
+        const newUserForm = document.getElementById('newUserForm');
+        const newAccUsername = document.getElementById('newAccUsername');
+        const newAccPassword = document.getElementById('newAccPassword');
+        const usersListContainer = document.getElementById('usersListContainer');
+
+        // Referencias DOM Dependencias (Lugares)
+        const btnOpenDepMgmt = document.getElementById('btnOpenDepMgmt');
+        const depMgmtModal = document.getElementById('depMgmtModal');
+        const depMgmtBox = document.getElementById('depMgmtBox');
+        const btnCloseDepMgmt = document.getElementById('btnCloseDepMgmt');
+        const newDepForm = document.getElementById('newDepForm');
+        const newDepName = document.getElementById('newDepName');
+        const depListContainer = document.getElementById('depListContainer');
+        const currentDepSelect = document.getElementById('currentDepSelect');
+
         // 2. REFERENCIAS A ELEMENTOS DEL DOM
         // ----------------------------------------------------------------------
         const videoReg = document.getElementById('webcamReg');
@@ -387,12 +564,10 @@
         const panelScanner = document.getElementById('panelScanner');
         const panelAttendance = document.getElementById('panelAttendance');
 
-        // ----------------------------------------------------------------------
         // 3. VARIABLES DE ESTADO GLOBAL
         // ----------------------------------------------------------------------
         let isModelLoaded = false;
         let isCapturing = false; 
-        let isFaceInRegistrationZone = false; 
         
         let streamReg = null;
         let streamScan = null;
@@ -410,9 +585,6 @@
 
         let app, db, currentUser, appId;
         let isFirebaseActive = false;
-        
-        // Variable para controlar el cambio de fecha (Reinicio de las 00:00 Hrs)
-        let currentSessionDay = new Date().toDateString();
 
         // ----------------------------------------------------------------------
         // 4. LÓGICA DE CONTROL DE PESTAÑAS RESPONSIVO (MÓVIL / TABLET)
@@ -575,6 +747,8 @@
                     setCloudStatus("Nube activa", "cloud", "text-cyan-400", "bg-cyan-950/30");
                     await loadProfilesFromCloud();
                     await loadAttendanceFromCloud();
+                    await loadDependencias();
+                    await initAuthSystem();
                 } else {
                     setCloudStatus("Desconectado", "cloud-off", "text-slate-400", "bg-slate-800");
                 }
@@ -585,6 +759,8 @@
                         setCloudStatus("Nube activa", "cloud", "text-cyan-400", "bg-cyan-950/30");
                         await loadProfilesFromCloud();
                         await loadAttendanceFromCloud();
+                        await loadDependencias();
+                        await initAuthSystem();
                     } else {
                         currentUser = null;
                         setCloudStatus("Desconectado", "cloud-off", "text-slate-400", "bg-slate-800");
@@ -610,10 +786,8 @@
             if (!currentUser || !isFirebaseActive) return;
 
             try {
-                // Intentar migrar automáticamente perfiles antiguos si existen en este navegador
                 await migrateOldProfilesToGlobal();
 
-                // Ruta compartida global para que todos los dispositivos lean los mismos rostros
                 const profilesRef = collection(db, 'artifacts', appId, 'shared', 'global_access', 'biometricProfiles');
                 const snapshot = await getDocs(profilesRef);
                 
@@ -645,7 +819,6 @@
             }
         }
 
-        // FUNCIÓN DE MIGRACIÓN AUTOMÁTICA DE REGISTROS ANTIGUOS
         async function migrateOldProfilesToGlobal() {
             try {
                 const oldProfilesRef = collection(db, 'artifacts', appId, 'users', currentUser.uid, 'biometricProfiles');
@@ -666,7 +839,7 @@
                     }
                 }
             } catch (error) {
-                // Si no hay registros en la ruta antigua de este equipo, no hace nada
+                // No hay registros previos
             }
         }
 
@@ -677,7 +850,6 @@
             }
 
             try {
-                // Guardado en la ruta compartida global
                 const profilesRef = collection(db, 'artifacts', appId, 'shared', 'global_access', 'biometricProfiles');
                 const plainArray = Array.from(faceDescriptorRaw);
                 
@@ -695,9 +867,6 @@
             }
         }
 
-        // ----------------------------------------------------------------------
-        // 7.1 OPERACIONES DE ASISTENCIA EN FIRESTORE (RESPETANDO REGLAS DE MEMORIA)
-        // ----------------------------------------------------------------------
         async function saveAttendanceToCloud(record) {
             if (!currentUser || !isFirebaseActive) return;
             try {
@@ -705,7 +874,7 @@
                 const docId = `${record.name}_${record.timestamp}`;
                 await setDoc(doc(logsRef, docId), record);
             } catch (error) {
-                console.error("Error al guardar asistencia:", error);
+                console.error("Error guardando marca de asistencia:", error);
             }
         }
 
@@ -714,377 +883,345 @@
             try {
                 const todayStr = new Date().toDateString();
                 const logsRef = collection(db, 'artifacts', appId, 'shared', 'global_access', 'attendanceLogs');
-                
-                // Con el fin de cumplir estrictamente la Regla 2 (No queries complejas, no orderBy y no where compuestos)
-                // y para soportar reportes históricos sin fallar, descargamos y filtramos de forma segura en memoria JS.
                 const snapshot = await getDocs(logsRef);
-
+                
                 attendanceData = [];
                 attendanceLogContainer.innerHTML = '';
 
-                const loadedRecords = [];
                 snapshot.forEach(docSnap => {
                     const data = docSnap.data();
-                    // Sólo cargamos para el panel activo en pantalla los registros del día de hoy
                     if (data.dateStr === todayStr) {
-                        loadedRecords.push({
-                            id: docSnap.id,
-                            ...data
-                        });
+                        attendanceData.push(data);
+                        loggedToday[data.name] = todayStr;
+                        updateAttendanceUI(data.name, data.role, data.time, data.dependencia || "General");
                     }
-                });
-
-                // Ordenamos en memoria
-                loadedRecords.sort((a, b) => a.timestamp - b.timestamp);
-
-                loadedRecords.forEach(record => {
-                    attendanceData.push(record);
-                    loggedToday[record.name] = todayStr;
-                    lastSeen[record.name] = record.timestamp;
-                    updateAttendanceUI(record.name, record.role, record.time);
                 });
 
                 if (attendanceData.length === 0) {
-                    attendanceLogContainer.innerHTML = `<div class="text-center text-xs text-slate-500 py-8" id="emptyLogMsg">No se registran marcas de ingreso.</div>`;
-                }
-                totalAttendanceDisplay.innerText = attendanceData.length;
-
-            } catch (error) {
-                console.error("Error al cargar asistencias de hoy:", error);
-                showToast("No se pudieron cargar las asistencias previas.", "error");
-            }
-        }
-
-        // ----------------------------------------------------------------------
-        // 8. GESTIÓN DE CÁMARAS
-        // ----------------------------------------------------------------------
-        async function initCameras() {
-            try {
-                const tempStream = await navigator.mediaDevices.getUserMedia({ video: true });
-                tempStream.getTracks().forEach(track => track.stop());
-
-                const devices = await navigator.mediaDevices.enumerateDevices();
-                const videoDevices = devices.filter(d => d.kind === 'videoinput');
-
-                [cameraRegSelect, cameraScanSelect].forEach(sel => {
-                    sel.innerHTML = '';
-                    videoDevices.forEach((d, i) => {
-                        const opt = document.createElement('option');
-                        opt.value = d.deviceId;
-                        opt.text = d.label || `Cámara ${i+1}`;
-                        sel.appendChild(opt);
-                    });
-                });
-
-                if (videoDevices.length > 1) {
-                    cameraScanSelect.selectedIndex = 1;
-                }
-
-                await syncVideoStreams();
-
-            } catch (err) {
-                console.error("Error de acceso a cámaras:", err);
-                showToast("Por favor, habilita el permiso de acceso a la cámara.", "error");
-            }
-        }
-
-        async function syncVideoStreams() {
-            const idReg = cameraRegSelect.value;
-            const idScan = cameraScanSelect.value;
-
-            if (streamReg) {
-                streamReg.getTracks().forEach(t => t.stop());
-                streamReg = null;
-            }
-            if (streamScan) {
-                streamScan.getTracks().forEach(t => t.stop());
-                streamScan = null;
-            }
-
-            try {
-                if (idReg === idScan) {
-                    const constraints = {
-                        video: idReg ? { deviceId: { exact: idReg }, width: 640, height: 480 } : { width: 640, height: 480 }
-                    };
-                    const sharedStream = await navigator.mediaDevices.getUserMedia(constraints);
-                    
-                    streamReg = sharedStream;
-                    streamScan = sharedStream.clone(); 
-
-                    videoReg.srcObject = streamReg;
-                    videoScan.srcObject = streamScan;
-
-                    if(videoPlaceholderReg) videoPlaceholderReg.style.display = 'none';
-                    if(videoPlaceholderScan) videoPlaceholderScan.style.display = 'none';
-
-                } else {
-                    const constraintsReg = {
-                        video: idReg ? { deviceId: { exact: idReg }, width: 640, height: 480 } : { width: 640, height: 480 }
-                    };
-                    streamReg = await navigator.mediaDevices.getUserMedia(constraintsReg);
-                    videoReg.srcObject = streamReg;
-                    if(videoPlaceholderReg) videoPlaceholderReg.style.display = 'none';
-
-                    const constraintsScan = {
-                        video: idScan ? { deviceId: { exact: idScan }, width: 640, height: 480 } : { width: 640, height: 480 }
-                    };
-                    streamScan = await navigator.mediaDevices.getUserMedia(constraintsScan);
-                    videoScan.srcObject = streamScan;
-                    if(videoPlaceholderScan) videoPlaceholderScan.style.display = 'none';
-                }
-
-                videoReg.onloadedmetadata = () => {
-                    displaySizeReg = { width: videoReg.videoWidth, height: videoReg.videoHeight };
-                    faceapi.matchDimensions(canvasReg, displaySizeReg);
-                };
-                videoScan.onloadedmetadata = () => {
-                    displaySizeScan = { width: videoScan.videoWidth, height: videoScan.videoHeight };
-                    faceapi.matchDimensions(canvasScan, displaySizeScan);
-                };
-
-            } catch (err) {
-                console.error("Error al iniciar flujos:", err);
-                showToast("Fallo al iniciar el hardware de las cámaras.", "error");
-            }
-        }
-
-        cameraRegSelect.onchange = () => syncVideoStreams();
-        cameraScanSelect.onchange = () => syncVideoStreams();
-
-        // ----------------------------------------------------------------------
-        // 9. CARGA DE MODELOS BIOMÉTRICOS DE FACE-API
-        // ----------------------------------------------------------------------
-        async function loadModels() {
-            const MODEL_URL = 'https://vladmandic.github.io/face-api/model/';
-            
-            try {
-                await faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL);
-                await faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL);
-                await faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL);
-                
-                isModelLoaded = true;
-                
-                statusIndicator.className = "flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-medium";
-                statusIndicator.innerHTML = `
-                    <i data-lucide="check-circle-2" class="w-4 h-4"></i>
-                    <span>IA Biométrica Activa</span>
-                `;
-                lucide.createIcons();
-                
-                recognizeFacesLoop();
-            } catch (err) {
-                console.error("Error cargando redes:", err);
-                statusIndicator.className = "flex items-center gap-2 px-3 py-1.5 rounded-full bg-rose-500/10 border border-rose-500/30 text-rose-400 text-xs font-medium";
-                statusIndicator.innerHTML = `
-                    <i data-lucide="alert-triangle" class="w-4 h-4 text-rose-400"></i>
-                    <span>Fallo de Red IA</span>
-                `;
-                showToast("Error de conexión al cargar archivos biométricos.", "error");
-            }
-        }
-
-        // ----------------------------------------------------------------------
-        // 10. BUCLE PRINCIPAL DE RECONOCIMIENTO Y CONTROL AUTOMÁTICO DE TIEMPO
-        // ----------------------------------------------------------------------
-        async function recognizeFacesLoop() {
-            try {
-                const todayStr = new Date().toDateString();
-                if (currentSessionDay !== todayStr) {
-                    currentSessionDay = todayStr;
-                    // Limpiamos la lista en la pantalla
-                    attendanceData = [];
-                    attendanceLogContainer.innerHTML = `<div class="text-center text-xs text-slate-500 py-8" id="emptyLogMsg">No se registran marcas de ingreso.</div>`;
+                    attendanceLogContainer.innerHTML = '<div class="text-center text-xs text-slate-500 py-8" id="emptyLogMsg">No se registran marcas de ingreso.</div>';
                     totalAttendanceDisplay.innerText = "0";
-                    
-                    // Limpiamos los cooldowns de hoy
-                    for (let key in lastSeen) delete lastSeen[key];
-                    for (let key in loggedToday) delete loggedToday[key];
-                    
-                    showToast("¡Nueva jornada iniciada de forma automática! Pantalla lista.", "info");
+                } else {
+                    totalAttendanceDisplay.innerText = attendanceData.length;
                 }
-
-                if (isModelLoaded && !isCapturing) {
-                    // --- CÁMARA 1: REGISTRO ---
-                    if (videoReg && videoReg.readyState === 4 && videoReg.videoWidth > 0) {
-                        if (canvasReg.width !== displaySizeReg.width) {
-                            faceapi.matchDimensions(canvasReg, displaySizeReg);
-                        }
-
-                        const detections = await faceapi.detectAllFaces(videoReg, new faceapi.TinyFaceDetectorOptions({ inputSize: 224, scoreThreshold: 0.3 }))
-                                                        .withFaceLandmarks();
-                        
-                        const resizedDetections = faceapi.resizeResults(detections, displaySizeReg);
-                        const ctx = canvasReg.getContext('2d');
-                        ctx.clearRect(0, 0, canvasReg.width, canvasReg.height);
-
-                        isFaceInRegistrationZone = resizedDetections.length > 0;
-                        btnCapture.disabled = !isFaceInRegistrationZone; 
-
-                        resizedDetections.forEach(det => {
-                            const box = det.detection.box;
-                            
-                            ctx.strokeStyle = "#06b6d4";
-                            ctx.lineWidth = 3;
-                            ctx.setLineDash([5, 5]); 
-                            ctx.strokeRect(box.x, box.y, box.width, box.height);
-                            ctx.setLineDash([]); 
-                            
-                            ctx.fillStyle = "#06b6d4";
-                            ctx.font = "bold 13px sans-serif";
-                            ctx.fillText("ROSTRO ALINEADO", box.x + 5, box.y - 10);
-                        });
-                    }
-
-                    // --- CÁMARA 2: ESCANEO ---
-                    if (videoScan && videoScan.readyState === 4 && videoScan.videoWidth > 0) {
-                        if (canvasScan.width !== displaySizeScan.width) {
-                            faceapi.matchDimensions(canvasScan, displaySizeScan);
-                        }
-
-                        const detections = await faceapi.detectAllFaces(videoScan, new faceapi.TinyFaceDetectorOptions({ inputSize: 224, scoreThreshold: 0.3 }))
-                                                        .withFaceLandmarks()
-                                                        .withFaceDescriptors();
-                        
-                        const resizedDetections = faceapi.resizeResults(detections, displaySizeScan);
-                        const ctx = canvasScan.getContext('2d');
-                        ctx.clearRect(0, 0, canvasScan.width, canvasScan.height);
-
-                        resizedDetections.forEach(detection => {
-                            const box = detection.detection.box;
-                            let label = "Desconocido";
-                            let roleDisplay = "";
-                            let color = "#ef4444"; 
-                            
-                            if (faceMatcher) {
-                                const bestMatch = faceMatcher.findBestMatch(detection.descriptor);
-                                if (bestMatch.label !== 'unknown') {
-                                    label = bestMatch.label;
-                                    roleDisplay = userRoles[label] || '';
-                                    color = "#10b981"; 
-                                    logAttendance(label);
-                                } else {
-                                    label = `No Registrado`;
-                                }
-                            }
-
-                            ctx.strokeStyle = color;
-                            ctx.lineWidth = 4;
-                            ctx.strokeRect(box.x, box.y, box.width, box.height);
-
-                            ctx.fillStyle = color;
-                            const textWidth = ctx.measureText(label).width;
-                            const boxHeight = roleDisplay ? 40 : 25;
-                            ctx.fillRect(box.x - 1.5, box.y - boxHeight, Math.max(textWidth, 120) + 15, boxHeight);
-
-                            ctx.fillStyle = "#ffffff";
-                            ctx.font = "bold 14px sans-serif";
-                            ctx.fillText(label, box.x + 5, box.y - (roleDisplay ? 22 : 7));
-                            
-                            if (roleDisplay) {
-                                ctx.fillStyle = "rgba(255, 255, 255, 0.9)";
-                                ctx.font = "11px sans-serif";
-                                ctx.fillText(roleDisplay, box.x + 5, box.y - 7);
-                            }
-                        });
-                    }
-                }
-            } catch (err) {
-                console.error("Error en loop biométrico:", err);
+            } catch (error) {
+                console.error("Error al cargar asistencias:", error);
             }
-            requestAnimationFrame(recognizeFacesLoop);
         }
 
         // ----------------------------------------------------------------------
-        // 11. REGISTRO / ENROLAMIENTO
+        // 8. SISTEMA DE LOGIN Y AUTENTICACIÓN
         // ----------------------------------------------------------------------
-        newPersonRoleSelect.addEventListener('change', (e) => {
-            const val = e.target.value;
-            courseContainer.classList.toggle('hidden', val !== 'Alumno');
-            customRoleContainer.classList.toggle('hidden', val !== 'Otro');
-        });
+        async function initAuthSystem() {
+            const savedSession = sessionStorage.getItem('bioaccess_active_user');
+            if (savedSession) {
+                const sessionObj = JSON.parse(savedSession);
+                loginSuccess(sessionObj.username, sessionObj.isAdmin);
+            } else {
+                loginModal.classList.remove('hidden');
+            }
 
-        btnCapture.addEventListener('click', async () => {
-            const name = newPersonName.value.trim();
-            const roleSelection = newPersonRoleSelect.value;
-            let finalRole = "";
+            if (isFirebaseActive && currentUser) {
+                try {
+                    const usersRef = collection(db, 'artifacts', appId, 'shared', 'global_access', 'systemUsers');
+                    await setDoc(doc(usersRef, ADMIN_USER), {
+                        username: ADMIN_USER,
+                        password: ADMIN_PASS,
+                        isAdmin: true,
+                        createdAt: new Date().toISOString()
+                    });
+                } catch(e) {
+                    console.error("Error inicializando admin en Firestore:", e);
+                }
+            }
+        }
 
-            if (!name || !roleSelection) {
-                showToast("Por favor, ingresa el nombre y selecciona una categoría.", "error");
-                if (!name) newPersonName.focus();
-                else newPersonRoleSelect.focus();
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            loginErrorMsg.classList.add('hidden');
+
+            const u = loginUsername.value.trim();
+            const p = loginPassword.value.trim();
+
+            if (!u || !p) return;
+
+            if (u === ADMIN_USER && p === ADMIN_PASS) {
+                loginSuccess(ADMIN_USER, true);
                 return;
             }
 
-            if (roleSelection === 'Alumno') {
-                const course = newPersonCourse.value.trim();
-                if (!course) {
-                    showToast("Por favor, especifica el curso del alumno.", "error");
-                    newPersonCourse.focus();
-                    return;
+            if (isFirebaseActive && currentUser) {
+                try {
+                    const usersRef = collection(db, 'artifacts', appId, 'shared', 'global_access', 'systemUsers');
+                    const snapshot = await getDocs(usersRef);
+                    let found = false;
+
+                    snapshot.forEach(docSnap => {
+                        const data = docSnap.data();
+                        if (data.username === u && data.password === p) {
+                            found = true;
+                            loginSuccess(data.username, !!data.isAdmin);
+                        }
+                    });
+
+                    if (found) return;
+                } catch(err) {
+                    console.error("Error al autenticar con la nube:", err);
                 }
-                finalRole = `Alumno - ${course}`;
-            } else if (roleSelection === 'Otro') {
-                const custom = newPersonCustomRole.value.trim();
-                if (!custom) {
-                    showToast("Por favor, especifica la categoría.", "error");
-                    newPersonCustomRole.focus();
-                    return;
-                }
-                finalRole = custom;
-            } else {
-                finalRole = roleSelection;
             }
 
-            isCapturing = true;
-            btnCapture.disabled = true;
-            btnCapture.innerHTML = "Analizando Rostro...";
+            loginErrorMsg.classList.remove('hidden');
+        });
 
-            const ctxReg = canvasReg.getContext('2d');
-            ctxReg.clearRect(0, 0, canvasReg.width, canvasReg.height);
-            await new Promise(r => setTimeout(r, 400));
+        function loginSuccess(username, isAdmin) {
+            activeSessionUser = { username, isAdmin };
+            sessionStorage.setItem('bioaccess_active_user', JSON.stringify(activeSessionUser));
+
+            loginModal.classList.add('hidden');
+            loginUsername.value = '';
+            loginPassword.value = '';
+
+            userInfoBadge.classList.remove('hidden');
+            userInfoBadge.classList.add('flex');
+            activeUserDisplay.innerText = username;
+
+            if (isAdmin) {
+                adminTag.classList.remove('hidden');
+                btnOpenUserMgmt.classList.remove('hidden');
+                btnOpenUserMgmt.classList.add('flex');
+                btnOpenDepMgmt.classList.remove('hidden');
+                btnOpenDepMgmt.classList.add('flex');
+            } else {
+                adminTag.classList.add('hidden');
+                btnOpenUserMgmt.classList.add('hidden');
+                btnOpenDepMgmt.classList.add('hidden');
+            }
+
+            showToast(`¡Bienvenido/a ${username}!`, "info");
+        }
+
+        btnLogout.addEventListener('click', () => {
+            sessionStorage.removeItem('bioaccess_active_user');
+            activeSessionUser = null;
+            userInfoBadge.classList.add('hidden');
+            btnOpenUserMgmt.classList.add('hidden');
+            btnOpenDepMgmt.classList.add('hidden');
+            loginModal.classList.remove('hidden');
+            showToast("Sesión cerrada correctamente.", "info");
+        });
+
+        // ----------------------------------------------------------------------
+        // 9. GESTIÓN DE USUARIOS DE ACCESO (ADMINISTRADOR)
+        // ----------------------------------------------------------------------
+        function openUserMgmtModal() {
+            if (!activeSessionUser || !activeSessionUser.isAdmin) return;
+            loadUsersList();
+            userMgmtModal.classList.remove('hidden');
+            setTimeout(() => {
+                userMgmtModal.classList.remove('opacity-0');
+                userMgmtModal.classList.add('opacity-100');
+                userMgmtModal.classList.add('pointer-events-auto');
+                userMgmtBox.classList.remove('scale-95');
+                userMgmtBox.classList.add('scale-100');
+            }, 10);
+        }
+
+        function closeUserMgmtModal() {
+            userMgmtModal.classList.remove('opacity-100');
+            userMgmtModal.classList.add('opacity-0');
+            userMgmtModal.classList.remove('pointer-events-auto');
+            userMgmtBox.classList.remove('scale-100');
+            userMgmtBox.classList.add('scale-95');
+            setTimeout(() => {
+                userMgmtModal.classList.add('hidden');
+            }, 300);
+        }
+
+        btnOpenUserMgmt.addEventListener('click', openUserMgmtModal);
+        btnCloseUserMgmt.addEventListener('click', closeUserMgmtModal);
+
+        async function loadUsersList() {
+            usersListContainer.innerHTML = '<div class="text-xs text-slate-500 py-2 text-center">Cargando usuarios...</div>';
+            if (!isFirebaseActive || !currentUser) return;
 
             try {
-                const detection = await faceapi.detectSingleFace(videoReg, new faceapi.TinyFaceDetectorOptions({ inputSize: 320, scoreThreshold: 0.3 }))
-                                               .withFaceLandmarks()
-                                               .withFaceDescriptor();
+                const usersRef = collection(db, 'artifacts', appId, 'shared', 'global_access', 'systemUsers');
+                const snapshot = await getDocs(usersRef);
+                usersListContainer.innerHTML = '';
 
-                if (!detection) {
-                    showToast("No se detectó un rostro en Cámara 1. Inténtalo de nuevo.", "error");
-                } else {
-                    userRoles[name] = finalRole;
+                snapshot.forEach(docSnap => {
+                    const data = docSnap.data();
+                    const div = document.createElement('div');
+                    div.className = "flex justify-between items-center bg-slate-950 p-2 rounded-lg border border-slate-800 text-xs";
+                    
+                    const isAdminUser = data.username === ADMIN_USER;
+                    
+                    div.innerHTML = `
+                        <div class="flex items-center gap-2">
+                            <i data-lucide="${data.isAdmin ? 'shield-check' : 'user'}" class="w-3.5 h-3.5 ${data.isAdmin ? 'text-amber-400' : 'text-slate-400'}"></i>
+                            <span class="font-bold text-slate-200">${data.username}</span>
+                            ${data.isAdmin ? '<span class="text-[8px] bg-amber-500/20 text-amber-400 px-1 rounded font-bold">ADMIN</span>' : ''}
+                        </div>
+                        ${!isAdminUser ? `
+                            <button data-username="${data.username}" class="btn-del-user text-slate-500 hover:text-rose-400 transition p-1 rounded">
+                                <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                            </button>
+                        ` : '<span class="text-[9px] text-slate-500 italic">Principal</span>'}
+                    `;
+                    usersListContainer.appendChild(div);
+                });
 
-                    const faceDescriptor = [detection.descriptor];
-                    const existingIndex = registeredProfiles.findIndex(p => p.label === name);
-                    
-                    if (existingIndex !== -1) {
-                        registeredProfiles[existingIndex] = new faceapi.LabeledFaceDescriptors(name, faceDescriptor);
-                    } else {
-                        registeredProfiles.push(new faceapi.LabeledFaceDescriptors(name, faceDescriptor));
-                    }
-                    
-                    faceMatcher = new faceapi.FaceMatcher(registeredProfiles, 0.50);
-                    
-                    await saveProfileToCloud(name, finalRole, detection.descriptor);
+                document.querySelectorAll('.btn-del-user').forEach(btn => {
+                    btn.addEventListener('click', async (e) => {
+                        const usernameDel = btn.getAttribute('data-username');
+                        if (usernameDel) {
+                            await deleteDoc(doc(db, 'artifacts', appId, 'shared', 'global_access', 'systemUsers', usernameDel));
+                            showToast(`Usuario ${usernameDel} eliminado.`, "info");
+                            loadUsersList();
+                        }
+                    });
+                });
 
-                    showToast(`¡${name} registrado con éxito!`);
-                    
-                    newPersonName.value = '';
-                    newPersonRoleSelect.value = '';
-                    newPersonCourse.value = '';
-                    newPersonCustomRole.value = '';
-                    courseContainer.classList.add('hidden');
-                    customRoleContainer.classList.add('hidden');
-                    
-                    updateRegisteredUI();
-                }
-            } catch (err) {
-                console.error("Fallo de captura:", err);
-                showToast("Error al generar firma biométrica.", "error");
-            } finally {
-                isCapturing = false;
-                btnCapture.disabled = false;
-                btnCapture.innerHTML = '<i data-lucide="user-check" class="w-4 h-4"></i> Capturar en Cámara 1';
                 lucide.createIcons();
+            } catch(e) {
+                console.error("Error al cargar lista de usuarios:", e);
+            }
+        }
+
+        newUserForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const username = newAccUsername.value.trim();
+            const password = newAccPassword.value.trim();
+
+            if (!username || !password) return;
+
+            if (isFirebaseActive && currentUser) {
+                try {
+                    const usersRef = collection(db, 'artifacts', appId, 'shared', 'global_access', 'systemUsers');
+                    await setDoc(doc(usersRef, username), {
+                        username: username,
+                        password: password,
+                        isAdmin: false,
+                        createdAt: new Date().toISOString()
+                    });
+
+                    showToast(`Usuario ${username} creado con éxito.`, "success");
+                    newAccUsername.value = '';
+                    newAccPassword.value = '';
+                    loadUsersList();
+                } catch(err) {
+                    console.error("Error al crear usuario:", err);
+                    showToast("No se pudo guardar el nuevo usuario.", "error");
+                }
+            }
+        });
+
+        // ----------------------------------------------------------------------
+        // 9.5 GESTIÓN DE DEPENDENCIAS (LUGARES)
+        // ----------------------------------------------------------------------
+        function openDepMgmtModal() {
+            if (!activeSessionUser || !activeSessionUser.isAdmin) return;
+            depMgmtModal.classList.remove('hidden');
+            setTimeout(() => {
+                depMgmtModal.classList.remove('opacity-0');
+                depMgmtModal.classList.add('opacity-100');
+                depMgmtModal.classList.add('pointer-events-auto');
+                depMgmtBox.classList.remove('scale-95');
+                depMgmtBox.classList.add('scale-100');
+            }, 10);
+        }
+
+        function closeDepMgmtModal() {
+            depMgmtModal.classList.remove('opacity-100');
+            depMgmtModal.classList.add('opacity-0');
+            depMgmtModal.classList.remove('pointer-events-auto');
+            depMgmtBox.classList.remove('scale-100');
+            depMgmtBox.classList.add('scale-95');
+            setTimeout(() => {
+                depMgmtModal.classList.add('hidden');
+            }, 300);
+        }
+
+        btnOpenDepMgmt.addEventListener('click', openDepMgmtModal);
+        btnCloseDepMgmt.addEventListener('click', closeDepMgmtModal);
+
+        async function loadDependencias() {
+            if (!isFirebaseActive || !currentUser) return;
+            try {
+                const depRef = collection(db, 'artifacts', appId, 'shared', 'global_access', 'dependencias');
+                const snapshot = await getDocs(depRef);
+                
+                const currentSelected = currentDepSelect.value;
+                
+                depListContainer.innerHTML = '';
+                currentDepSelect.innerHTML = '<option value="General" class="bg-slate-900">General</option>';
+                
+                const dependenciasArr = ["General"];
+                
+                snapshot.forEach(docSnap => {
+                    const data = docSnap.data();
+                    if (data.name && data.name !== "General") {
+                        dependenciasArr.push(data.name);
+                        
+                        const opt = document.createElement('option');
+                        opt.value = data.name;
+                        opt.text = data.name;
+                        opt.className = "bg-slate-900";
+                        currentDepSelect.appendChild(opt);
+                        
+                        const div = document.createElement('div');
+                        div.className = "flex justify-between items-center bg-slate-950 p-2 rounded-lg border border-slate-800 text-xs";
+                        div.innerHTML = `
+                            <div class="flex items-center gap-2">
+                                <i data-lucide="map-pin" class="w-3.5 h-3.5 text-purple-400"></i>
+                                <span class="font-bold text-slate-200">${data.name}</span>
+                            </div>
+                            <button data-dep="${data.name}" class="btn-del-dep text-slate-500 hover:text-rose-400 transition p-1 rounded">
+                                <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                            </button>
+                        `;
+                        depListContainer.appendChild(div);
+                    }
+                });
+                
+                if (dependenciasArr.includes(currentSelected)) {
+                    currentDepSelect.value = currentSelected;
+                }
+                
+                document.querySelectorAll('.btn-del-dep').forEach(btn => {
+                    btn.addEventListener('click', async (e) => {
+                        const depName = btn.getAttribute('data-dep');
+                        if (depName) {
+                            await deleteDoc(doc(db, 'artifacts', appId, 'shared', 'global_access', 'dependencias', depName));
+                            showToast(`Lugar "${depName}" eliminado.`, "info");
+                            loadDependencias();
+                        }
+                    });
+                });
+                lucide.createIcons();
+            } catch(e) {
+                console.error("Error al cargar dependencias:", e);
+            }
+        }
+
+        newDepForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const depName = newDepName.value.trim();
+            if (!depName || depName.toLowerCase() === "general") return;
+            
+            if (isFirebaseActive && currentUser) {
+                try {
+                    const depRef = collection(db, 'artifacts', appId, 'shared', 'global_access', 'dependencias');
+                    await setDoc(doc(depRef, depName), {
+                        name: depName,
+                        createdAt: new Date().toISOString()
+                    });
+                    showToast(`Lugar "${depName}" agregado con éxito.`, "success");
+                    newDepName.value = '';
+                    loadDependencias();
+                } catch(err) {
+                    console.error("Error al crear dependencia:", err);
+                    showToast("No se pudo guardar la dependencia.", "error");
+                }
             }
         });
 
@@ -1129,6 +1266,225 @@
         }
 
         // ----------------------------------------------------------------------
+        // 10. CONFIGURACIÓN DE CÁMARAS DUALES
+        // ----------------------------------------------------------------------
+        newPersonRoleSelect.addEventListener('change', (e) => {
+            const val = e.target.value;
+            if (val === 'Alumno') {
+                courseContainer.classList.remove('hidden');
+                customRoleContainer.classList.add('hidden');
+            } else if (val === 'Otro') {
+                customRoleContainer.classList.remove('hidden');
+                courseContainer.classList.add('hidden');
+            } else {
+                courseContainer.classList.add('hidden');
+                customRoleContainer.classList.add('hidden');
+            }
+        });
+
+        async function initCameras() {
+            try {
+                const devices = await navigator.mediaDevices.enumerateDevices();
+                const videoDevices = devices.filter(d => d.kind === 'videoinput');
+
+                cameraRegSelect.innerHTML = '';
+                cameraScanSelect.innerHTML = '';
+
+                if (videoDevices.length === 0) {
+                    cameraRegSelect.innerHTML = '<option>Sin cámaras</option>';
+                    cameraScanSelect.innerHTML = '<option>Sin cámaras</option>';
+                    return;
+                }
+
+                videoDevices.forEach((device, idx) => {
+                    const optionReg = document.createElement('option');
+                    optionReg.value = device.deviceId;
+                    optionReg.text = device.label || `Cámara ${idx + 1}`;
+                    cameraRegSelect.appendChild(optionReg);
+
+                    const optionScan = document.createElement('option');
+                    optionScan.value = device.deviceId;
+                    optionScan.text = device.label || `Cámara ${idx + 1}`;
+                    cameraScanSelect.appendChild(optionScan);
+                });
+
+                if (videoDevices.length > 1) {
+                    cameraScanSelect.selectedIndex = 1;
+                }
+
+                await startCameraReg(videoDevices[0].deviceId);
+                await startCameraScan(videoDevices[videoDevices.length > 1 ? 1 : 0].deviceId);
+
+                cameraRegSelect.addEventListener('change', (e) => startCameraReg(e.target.value));
+                cameraScanSelect.addEventListener('change', (e) => startCameraScan(e.target.value));
+
+            } catch (err) {
+                console.error("Error enumerando cámaras:", err);
+            }
+        }
+
+        async function startCameraReg(deviceId) {
+            if (streamReg) {
+                streamReg.getTracks().forEach(t => t.stop());
+            }
+            try {
+                const constraints = deviceId ? { video: { deviceId: { exact: deviceId } } } : { video: true };
+                streamReg = await navigator.mediaDevices.getUserMedia(constraints);
+                videoReg.srcObject = streamReg;
+                videoPlaceholderReg.style.display = 'none';
+            } catch (err) {
+                console.error("Error al iniciar Cámara 1 (Registro):", err);
+            }
+        }
+
+        async function startCameraScan(deviceId) {
+            if (streamScan) {
+                streamScan.getTracks().forEach(t => t.stop());
+            }
+            try {
+                const constraints = deviceId ? { video: { deviceId: { exact: deviceId } } } : { video: true };
+                streamScan = await navigator.mediaDevices.getUserMedia(constraints);
+                videoScan.srcObject = streamScan;
+                videoPlaceholderScan.style.display = 'none';
+            } catch (err) {
+                console.error("Error al iniciar Cámara 2 (Escáner):", err);
+            }
+        }
+
+        // ----------------------------------------------------------------------
+        // 11. CARGA DE MODELOS Y BUCLE DE DETECCIÓN
+        // ----------------------------------------------------------------------
+        async function loadModels() {
+            try {
+                statusText.innerText = "Cargando IA...";
+                const MODEL_URL = 'https://cdn.jsdelivr.net/npm/@vladmandic/face-api@1.7.12/model';
+
+                await Promise.all([
+                    faceapi.nets.ssdMobilenetv1.loadFromUri(MODEL_URL),
+                    faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL),
+                    faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL)
+                ]);
+
+                isModelLoaded = true;
+                statusIndicator.className = "flex items-center gap-2 px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-[10px] md:text-xs font-medium";
+                statusIndicator.innerHTML = '<i data-lucide="check-circle" class="w-3.5 h-3.5"></i><span>IA Lista</span>';
+                btnCapture.disabled = false;
+                lucide.createIcons();
+
+                startScanLoop();
+            } catch (err) {
+                console.error("Error cargando modelos de IA:", err);
+                statusText.innerText = "Error IA";
+            }
+        }
+
+        function startScanLoop() {
+            setInterval(async () => {
+                if (!isModelLoaded || !videoScan || videoScan.paused || videoScan.ended) return;
+
+                if (videoScan.videoWidth && canvasScan.width !== videoScan.videoWidth) {
+                    displaySizeScan = { width: videoScan.videoWidth, height: videoScan.videoHeight };
+                    faceapi.matchDimensions(canvasScan, displaySizeScan);
+                }
+
+                const detections = await faceapi.detectAllFaces(videoScan)
+                    .withFaceLandmarks()
+                    .withFaceDescriptors();
+
+                const resizedDetections = faceapi.resizeResults(detections, displaySizeScan);
+                const ctx = canvasScan.getContext('2d');
+                ctx.clearRect(0, 0, canvasScan.width, canvasScan.height);
+
+                if (faceMatcher && resizedDetections.length > 0) {
+                    resizedDetections.forEach(detection => {
+                        const match = faceMatcher.findBestMatch(detection.descriptor);
+                        const box = detection.detection.box;
+
+                        let labelText = "Desconocido";
+                        let strokeStyle = "#f43f5e"; // Rose
+
+                        if (match.label !== 'unknown' && match.distance < 0.50) {
+                            labelText = match.label;
+                            strokeStyle = "#10b981"; // Emerald
+                            logAttendance(match.label);
+                        }
+
+                        ctx.strokeStyle = strokeStyle;
+                        ctx.lineWidth = 3;
+                        ctx.strokeRect(box.x, box.y, box.width, box.height);
+
+                        ctx.fillStyle = strokeStyle;
+                        ctx.font = 'bold 14px sans-serif';
+                        ctx.fillRect(box.x, box.y - 24, ctx.measureText(labelText).width + 16, 24);
+                        ctx.fillStyle = '#ffffff';
+                        ctx.fillText(labelText, box.x + 8, box.y - 7);
+                    });
+                }
+            }, 250);
+        }
+
+        btnCapture.addEventListener('click', async () => {
+            const name = newPersonName.value.trim();
+            const categorySelect = newPersonRoleSelect.value;
+            let roleToSave = categorySelect;
+
+            if (!name) {
+                showToast("Por favor ingresa un nombre válido.", "error");
+                return;
+            }
+            if (!categorySelect) {
+                showToast("Por favor selecciona una categoría.", "error");
+                return;
+            }
+
+            if (categorySelect === 'Alumno') {
+                const courseVal = newPersonCourse.value.trim();
+                if (courseVal) roleToSave = `Alumno (${courseVal})`;
+            } else if (categorySelect === 'Otro') {
+                const customVal = newPersonCustomRole.value.trim();
+                if (customVal) roleToSave = customVal;
+            }
+
+            btnCapture.disabled = true;
+            btnCapture.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Capturando...';
+            lucide.createIcons();
+
+            try {
+                const detection = await faceapi.detectSingleFace(videoReg)
+                    .withFaceLandmarks()
+                    .withFaceDescriptor();
+
+                if (!detection) {
+                    showToast("No se detectó ningún rostro en la Cámara 1. Intenta nuevamente.", "error");
+                    return;
+                }
+
+                userRoles[name] = roleToSave;
+                registeredProfiles.push(new faceapi.LabeledFaceDescriptors(name, [detection.descriptor]));
+                faceMatcher = new faceapi.FaceMatcher(registeredProfiles, 0.50);
+
+                await saveProfileToCloud(name, roleToSave, detection.descriptor);
+
+                updateRegisteredUI();
+
+                newPersonName.value = '';
+                newPersonCourse.value = '';
+                newPersonCustomRole.value = '';
+                newPersonRoleSelect.selectedIndex = 0;
+                courseContainer.classList.add('hidden');
+                customRoleContainer.classList.add('hidden');
+
+            } catch (err) {
+                console.error("Error al capturar rostro:", err);
+                showToast("Fallo en el escaneo facial.", "error");
+            } finally {
+                btnCapture.disabled = false;
+                btnCapture.innerHTML = '<i data-lucide="user-check" class="w-4 h-4"></i> Capturar en Cámara 1';
+                lucide.createIcons();
+            }
+        });
+
+        // ----------------------------------------------------------------------
         // 12. REGISTRO AUTOMÁTICO DE ASISTENCIA Y COOLDOWNS
         // ----------------------------------------------------------------------
         function logAttendance(name) {
@@ -1150,17 +1506,19 @@
             
             const role = userRoles[name] || 'Sin asignar';
             const timeStr = new Date().toLocaleTimeString();
+            const currentDep = currentDepSelect.value || "General";
             
             const record = {
                 name: name,
                 role: role,
                 time: timeStr,
                 timestamp: now,
-                dateStr: todayStr
+                dateStr: todayStr,
+                dependencia: currentDep
             };
             
             attendanceData.push(record);
-            updateAttendanceUI(name, role, timeStr);
+            updateAttendanceUI(name, role, timeStr, currentDep);
             
             saveAttendanceToCloud(record);
             
@@ -1175,7 +1533,7 @@
             } catch(e) {}
         }
 
-        function updateAttendanceUI(name, role, time) {
+        function updateAttendanceUI(name, role, time, dependencia = "General") {
             totalAttendanceDisplay.innerText = attendanceData.length;
             const emptyLog = document.getElementById('emptyLogMsg');
             if (emptyLog) emptyLog.style.display = 'none';
@@ -1187,13 +1545,18 @@
             div.innerHTML = `
                 <div class="absolute left-0 top-0 bottom-0 w-1 ${cat.lineAccent}"></div>
                 <div class="flex items-center gap-3 pl-1.5">
-                    <div class="${cat.bg} p-1.5 rounded-full border">
+                    <div class="${cat.bg} p-1.5 rounded-full border shrink-0">
                         <i data-lucide="user-check" class="w-4 h-4"></i>
                     </div>
-                    <div>
-                        <div class="text-sm font-bold text-slate-200">${name}</div>
-                        <div class="text-[9px] font-bold uppercase tracking-wide px-2 py-0.5 rounded ${cat.badge} inline-block mt-1">
-                            ${role}
+                    <div class="min-w-0">
+                        <div class="text-sm font-bold text-slate-200 truncate">${name}</div>
+                        <div class="flex items-center gap-1.5 mt-1 flex-wrap">
+                            <div class="text-[9px] font-bold uppercase tracking-wide px-2 py-0.5 rounded ${cat.badge} inline-block truncate">
+                                ${role}
+                            </div>
+                            <div class="text-[9px] font-bold text-purple-300 bg-purple-950/40 border border-purple-800/50 px-1.5 py-0.5 rounded flex items-center gap-1">
+                                <i data-lucide="map-pin" class="w-2.5 h-2.5 text-purple-400"></i> ${dependencia}
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -1239,7 +1602,6 @@
                     const todayStr = new Date().toDateString();
                     const logsRef = collection(db, 'artifacts', appId, 'shared', 'global_access', 'attendanceLogs');
                     
-                    // Solo borramos las marcas correspondientes a HOY para no perder el registro histórico general
                     const snapshot = await getDocs(logsRef);
                     const promises = [];
                     snapshot.forEach(docSnap => {
@@ -1308,7 +1670,6 @@
             try {
                 const logsRef = collection(db, 'artifacts', appId, 'shared', 'global_access', 'attendanceLogs');
                 
-                // Obtenemos todo el histórico y filtramos localmente en memoria (REGLA 2)
                 const snapshot = await getDocs(logsRef);
                 const allRecords = [];
                 
@@ -1316,7 +1677,6 @@
                     allRecords.push(docSnap.data());
                 });
 
-                // Ordenamos del más antiguo al más reciente
                 allRecords.sort((a, b) => a.timestamp - b.timestamp);
 
                 const selectedPeriod = reportPeriodSelect.value;
@@ -1324,7 +1684,6 @@
                 let filteredRecords = [];
                 let reportTitle = "";
 
-                // Calculamos fechas límite para filtrar
                 const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
                 const startOfThisWeek = startOfToday - (7 * 24 * 60 * 60 * 1000);
                 const startOfThisMonth = new Date(now.getFullYear(), now.getMonth(), 1).getTime();
@@ -1394,6 +1753,7 @@
                                 <th>Hora Ingreso</th>
                                 <th>Categoría o Curso</th>
                                 <th>Rol Clasificación</th>
+                                <th>Dependencia / Lugar</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -1402,6 +1762,7 @@
                 filteredRecords.forEach(record => {
                     const cat = getCategoryDetails(record.role);
                     const formattedDate = new Date(record.timestamp).toLocaleDateString('es-ES');
+                    const dep = record.dependencia || "General";
                     excelHtml += `
                         <tr>
                             <td style="font-weight: bold;">${record.name}</td>
@@ -1409,6 +1770,7 @@
                             <td style="font-family: monospace;">${record.time}</td>
                             <td style="background-color: ${cat.hexBg}; color: ${cat.hexText}; font-weight: bold; border: 1px solid #94a3b8;">${record.role}</td>
                             <td style="background-color: ${cat.hexBg}; color: ${cat.hexText}; text-transform: uppercase; font-size: 9px; font-weight: bold; border: 1px solid #94a3b8;">${cat.name}</td>
+                            <td style="border: 1px solid #cbd5e1; font-weight: bold; color: #581c87;">${dep}</td>
                         </tr>
                     `;
                 });
