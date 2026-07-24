@@ -230,40 +230,40 @@
         </div>
         
         <div class="flex items-center justify-between sm:justify-end gap-2 md:gap-3 w-full sm:w-auto border-t border-slate-800/60 sm:border-0 pt-2 sm:pt-0 flex-wrap">
-            <div id="userInfoBadge" class="hidden items-center gap-2 bg-slate-950 border border-slate-800 px-3 py-1 rounded-full text-xs">
+            <div id="userInfoBadge" class="hidden items-center gap-2 bg-slate-950 border border-slate-800 px-3 py-1.5 md:px-4 md:py-2 rounded-full text-xs md:text-sm">
                 <span id="activeUserDisplay" class="font-bold text-cyan-400">168434995</span>
                 <span id="adminTag" class="text-[9px] bg-amber-500/20 text-amber-400 border border-amber-500/30 px-1.5 py-0.5 rounded font-bold uppercase">Admin</span>
             </div>
 
             <!-- Selector de Dependencia Activa -->
-            <div class="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-950 border border-slate-800 text-xs">
-                <i data-lucide="map-pin" class="w-3.5 h-3.5 text-purple-400"></i>
-                <select id="currentDepSelect" class="bg-transparent text-slate-200 text-[10px] md:text-xs focus:outline-none cursor-pointer font-semibold max-w-[110px] md:max-w-[140px] truncate">
+            <div class="flex items-center gap-1.5 px-3 py-1.5 md:px-4 md:py-2 rounded-full bg-slate-950 border border-slate-800 text-xs md:text-sm">
+                <i data-lucide="map-pin" class="w-4 h-4 text-purple-400"></i>
+                <select id="currentDepSelect" class="bg-transparent text-slate-200 text-xs md:text-sm focus:outline-none cursor-pointer font-semibold max-w-[110px] md:max-w-[140px] truncate">
                     <option value="General" class="bg-slate-900">General</option>
                 </select>
             </div>
 
-            <button id="btnOpenUserMgmt" class="hidden items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 text-[10px] md:text-xs font-medium border border-slate-700 transition" title="Administrar Usuarios">
-                <i data-lucide="users" class="w-3.5 h-3.5 text-cyan-400"></i>
+            <button id="btnOpenUserMgmt" class="hidden items-center gap-1.5 px-3 py-1.5 md:px-4 md:py-2 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs md:text-sm font-medium border border-slate-700 transition" title="Administrar Usuarios">
+                <i data-lucide="users" class="w-4 h-4 text-cyan-400"></i>
                 <span class="hidden sm:inline">Usuarios</span>
             </button>
 
-            <button id="btnOpenDepMgmt" class="hidden items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 text-[10px] md:text-xs font-medium border border-slate-700 transition" title="Administrar Dependencias">
-                <i data-lucide="map-pin" class="w-3.5 h-3.5 text-purple-400"></i>
+            <button id="btnOpenDepMgmt" class="hidden items-center gap-1.5 px-3 py-1.5 md:px-4 md:py-2 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs md:text-sm font-medium border border-slate-700 transition" title="Administrar Dependencias">
+                <i data-lucide="map-pin" class="w-4 h-4 text-purple-400"></i>
                 <span class="hidden sm:inline">Lugares</span>
             </button>
 
-            <button id="btnLogout" class="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-rose-950/40 hover:bg-rose-900/60 text-rose-300 border border-rose-800/40 text-[10px] md:text-xs font-medium transition" title="Cerrar Sesión">
-                <i data-lucide="log-out" class="w-3.5 h-3.5"></i>
+            <button id="btnLogout" class="flex items-center gap-1.5 px-3 py-1.5 md:px-4 md:py-2 rounded-full bg-rose-950/40 hover:bg-rose-900/60 text-rose-300 border border-rose-800/40 text-xs md:text-sm font-medium transition" title="Cerrar Sesión">
+                <i data-lucide="log-out" class="w-4 h-4"></i>
                 <span>Salir</span>
             </button>
 
-            <div id="cloudStatus" class="flex items-center gap-2 px-2.5 py-1 rounded-full bg-slate-800 border border-slate-700 text-slate-400 text-[10px] md:text-xs font-medium">
-                <i data-lucide="cloud-off" class="w-3.5 h-3.5"></i>
+            <div id="cloudStatus" class="flex items-center gap-2 px-3 py-1.5 md:px-4 md:py-2 rounded-full bg-slate-800 border border-slate-700 text-slate-400 text-xs md:text-sm font-medium">
+                <i data-lucide="cloud-off" class="w-4 h-4"></i>
                 <span>Nube inactiva</span>
             </div>
-            <div id="statusIndicator" class="flex items-center gap-2 px-2.5 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-[10px] md:text-xs font-medium">
-                <i data-lucide="loader-2" class="w-3.5 h-3.5 animate-spin"></i>
+            <div id="statusIndicator" class="flex items-center gap-2 px-3 py-1.5 md:px-4 md:py-2 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs md:text-sm font-medium">
+                <i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i>
                 <span id="statusText">Iniciando IA...</span>
             </div>
         </div>
@@ -310,8 +310,8 @@
                         </div>
                     </div>
 
-                    <button id="btnCapture" disabled class="w-full bg-emerald-600 hover:bg-emerald-500 disabled:bg-slate-800 disabled:text-slate-500 border border-emerald-500 text-white py-2.5 mt-2 rounded-lg text-sm font-bold transition flex items-center justify-center gap-2 shadow-lg shadow-emerald-900/20">
-                        <i data-lucide="user-check" class="w-4 h-4"></i> Capturar en Cámara 1
+                    <button id="btnCapture" disabled class="w-full bg-emerald-600 hover:bg-emerald-500 disabled:bg-slate-800 disabled:text-slate-500 border border-emerald-500 text-white py-3 mt-3 rounded-lg text-sm md:text-base font-bold transition flex items-center justify-center gap-2 shadow-lg shadow-emerald-900/20">
+                        <i data-lucide="user-check" class="w-5 h-5"></i> Capturar en Cámara 1
                     </button>
                 </div>
             </div>
@@ -362,7 +362,7 @@
                 </div>
 
                 <!-- MINI VENTANA FLOTANTE: CÁMARA 1 (REGISTRO ENROLADO) -->
-                <div class="absolute top-3 left-3 w-28 sm:w-44 md:w-56 bg-slate-900/95 backdrop-blur-md border border-slate-700/60 rounded-xl md:rounded-2xl p-1.5 md:p-2.5 shadow-2xl z-30 flex flex-col gap-1.5 md:gap-2 transition-all hover:scale-[1.02]">
+                <div id="pipCamera1" class="absolute top-3 left-3 w-28 sm:w-44 md:w-56 bg-slate-900/95 backdrop-blur-md border border-slate-700/60 rounded-xl md:rounded-2xl p-1.5 md:p-2.5 shadow-2xl z-30 flex flex-col gap-1.5 md:gap-2 transition-all hover:scale-[1.02]">
                     <div class="flex items-center justify-between gap-1">
                         <div class="flex items-center gap-1 shrink-0">
                             <span class="w-1 h-1 md:w-1.5 md:h-1.5 rounded-full bg-cyan-400 animate-pulse"></span>
@@ -429,8 +429,8 @@
                     <span id="totalAttendance" class="font-bold text-cyan-400 font-mono text-lg">0</span>
                 </div>
                 
-                <button id="btnOpenReportModal" class="w-full bg-gradient-to-r from-cyan-600 to-teal-600 hover:from-cyan-500 hover:to-teal-500 text-white py-3 rounded-xl text-sm font-bold transition flex items-center justify-center gap-2 group shadow-lg shadow-cyan-950/20">
-                    <i data-lucide="file-spreadsheet" class="w-4 h-4 group-hover:scale-110 transition-transform"></i> 
+                <button id="btnOpenReportModal" class="w-full bg-gradient-to-r from-cyan-600 to-teal-600 hover:from-cyan-500 hover:to-teal-500 text-white py-3.5 rounded-xl text-sm md:text-base font-bold transition flex items-center justify-center gap-2 group shadow-lg shadow-cyan-950/20">
+                    <i data-lucide="file-spreadsheet" class="w-5 h-5 group-hover:scale-110 transition-transform"></i> 
                     Exportar Reportes
                 </button>
             </div>
@@ -438,18 +438,18 @@
     </main>
 
     <!-- BARRA DE NAVEGACIÓN MÓVIL (Solo visible en pantallas < lg) -->
-    <nav id="mobileNav" class="lg:hidden bg-slate-900 border-t border-slate-800 px-2 py-1.5 flex justify-around items-center shrink-0 z-30 shadow-2xl">
-        <button id="tabRegister" class="flex flex-col items-center gap-1 text-slate-400 hover:text-cyan-400 transition py-1.5 px-3 rounded-xl min-w-[70px]">
-            <i data-lucide="user-plus" class="w-5 h-5"></i>
-            <span class="text-[9px] font-bold">Registro</span>
+    <nav id="mobileNav" class="lg:hidden bg-slate-900 border-t border-slate-800 px-2 py-3 flex justify-around items-center shrink-0 z-30 shadow-2xl">
+        <button id="tabRegister" class="flex flex-col items-center gap-1.5 text-slate-400 hover:text-cyan-400 transition py-2 px-4 rounded-xl min-w-[80px]">
+            <i data-lucide="user-plus" class="w-6 h-6"></i>
+            <span class="text-[10px] md:text-xs font-bold">Registro</span>
         </button>
-        <button id="tabScanner" class="flex flex-col items-center gap-1 text-cyan-400 hover:text-cyan-400 transition py-1.5 px-3 rounded-xl bg-slate-800/50 min-w-[70px]">
-            <i data-lucide="scan-face" class="w-5 h-5"></i>
-            <span class="text-[9px] font-bold">Escáner</span>
+        <button id="tabScanner" class="flex flex-col items-center gap-1.5 text-cyan-400 hover:text-cyan-400 transition py-2 px-4 rounded-xl bg-slate-800/50 min-w-[80px]">
+            <i data-lucide="scan-face" class="w-6 h-6"></i>
+            <span class="text-[10px] md:text-xs font-bold">Escáner</span>
         </button>
-        <button id="tabAttendance" class="flex flex-col items-center gap-1 text-slate-400 hover:text-cyan-400 transition py-1.5 px-3 rounded-xl min-w-[70px]">
-            <i data-lucide="clipboard-list" class="w-5 h-5"></i>
-            <span class="text-[9px] font-bold">Ingresos</span>
+        <button id="tabAttendance" class="flex flex-col items-center gap-1.5 text-slate-400 hover:text-cyan-400 transition py-2 px-4 rounded-xl min-w-[80px]">
+            <i data-lucide="clipboard-list" class="w-6 h-6"></i>
+            <span class="text-[10px] md:text-xs font-bold">Ingresos</span>
         </button>
     </nav>
 
@@ -563,6 +563,8 @@
         const panelRegister = document.getElementById('panelRegister');
         const panelScanner = document.getElementById('panelScanner');
         const panelAttendance = document.getElementById('panelAttendance');
+        
+        const pipCamera1 = document.getElementById('pipCamera1');
 
         // 3. VARIABLES DE ESTADO GLOBAL
         // ----------------------------------------------------------------------
@@ -579,7 +581,7 @@
         const userRoles = {};
         
         let attendanceData = []; 
-        const lastSeen = {}; 
+        const lastLoggedTime = {}; 
         const loggedToday = {}; 
         const COOLDOWN_MS = 30000; 
 
@@ -633,8 +635,15 @@
 
         window.addEventListener('resize', () => {
             if (window.innerWidth >= 1024) {
-                panelRegister.classList.remove('hidden');
-                panelRegister.classList.add('flex');
+                // Solo muestra el panel izquierdo si es administrador
+                if (activeSessionUser && activeSessionUser.isAdmin) {
+                    panelRegister.classList.remove('hidden');
+                    panelRegister.classList.add('flex');
+                } else {
+                    panelRegister.classList.add('hidden');
+                    panelRegister.classList.remove('flex');
+                }
+                
                 panelScanner.classList.remove('hidden');
                 panelScanner.classList.add('flex');
                 panelAttendance.classList.remove('hidden');
@@ -774,8 +783,8 @@
         }
 
         function setCloudStatus(text, icon, colorClass, bgClass) {
-            cloudStatus.className = `flex items-center gap-2 px-3 py-1.5 rounded-full ${bgClass} border border-slate-700/50 ${colorClass} text-[10px] md:text-xs font-medium`;
-            cloudStatus.innerHTML = `<i data-lucide="${icon}" class="w-3.5 h-3.5"></i><span>${text}</span>`;
+            cloudStatus.className = `flex items-center gap-2 px-3 py-1.5 md:px-4 md:py-2 rounded-full ${bgClass} border border-slate-700/50 ${colorClass} text-xs md:text-sm font-medium`;
+            cloudStatus.innerHTML = `<i data-lucide="${icon}" class="w-4 h-4"></i><span>${text}</span>`;
             lucide.createIcons();
         }
 
@@ -986,14 +995,39 @@
 
             if (isAdmin) {
                 adminTag.classList.remove('hidden');
+                
                 btnOpenUserMgmt.classList.remove('hidden');
                 btnOpenUserMgmt.classList.add('flex');
                 btnOpenDepMgmt.classList.remove('hidden');
                 btnOpenDepMgmt.classList.add('flex');
+                
+                // Mostrar herramientas de registro y PiP para Admin
+                pipCamera1.classList.remove('hidden');
+                tabRegister.classList.remove('hidden');
+                tabRegister.classList.add('flex');
+                if(window.innerWidth >= 1024) {
+                    panelRegister.classList.remove('hidden');
+                    panelRegister.classList.add('flex');
+                }
             } else {
                 adminTag.classList.add('hidden');
+                
                 btnOpenUserMgmt.classList.add('hidden');
+                btnOpenUserMgmt.classList.remove('flex');
                 btnOpenDepMgmt.classList.add('hidden');
+                btnOpenDepMgmt.classList.remove('flex');
+                
+                // Modo Solo Lectura para Usuarios Comunes
+                pipCamera1.classList.add('hidden');
+                tabRegister.classList.add('hidden');
+                tabRegister.classList.remove('flex');
+                panelRegister.classList.add('hidden');
+                panelRegister.classList.remove('flex');
+                
+                // Si estaba en la pestaña de registro móvil, moverlo al escáner
+                if (tabRegister.classList.contains('text-cyan-400')) {
+                    switchTab('scanner');
+                }
             }
 
             showToast(`¡Bienvenido/a ${username}!`, "info");
@@ -1402,22 +1436,51 @@
 
                         let labelText = "Desconocido";
                         let strokeStyle = "#f43f5e"; // Rose
+                        let drawBox = true;
 
                         if (match.label !== 'unknown' && match.distance < 0.50) {
-                            labelText = match.label;
-                            strokeStyle = "#10b981"; // Emerald
-                            logAttendance(match.label);
+                            const now = Date.now();
+                            const todayStr = new Date().toDateString();
+                            const lastLogTime = lastLoggedTime[match.label] || 0;
+                            const timeSinceLog = now - lastLogTime;
+                            
+                            // Determinar si debemos autorizar el log
+                            let canLog = false;
+                            if (chkReportAlways && !chkReportAlways.checked) {
+                                canLog = (loggedToday[match.label] !== todayStr);
+                            } else {
+                                canLog = (timeSinceLog >= COOLDOWN_MS);
+                            }
+
+                            if (canLog) {
+                                logAttendance(match.label); // Ejecuta el registro
+                                labelText = match.label;
+                                strokeStyle = "#10b981"; // Emerald
+                            } else {
+                                // Si ya se registró hace poco, manejamos el estado visual anti-spam
+                                if (timeSinceLog < 3000) {
+                                    // Muestra confirmación los primeros 3 segundos
+                                    labelText = "✓ REGISTRADO";
+                                    strokeStyle = "#34d399"; // Verde claro
+                                } else {
+                                    // Pasados los 3 segs y mientras esté en cooldown, oculta el cuadro
+                                    // Esto evita que siga analizando visualmente y ensuciando la interfaz
+                                    drawBox = false;
+                                }
+                            }
                         }
 
-                        ctx.strokeStyle = strokeStyle;
-                        ctx.lineWidth = 3;
-                        ctx.strokeRect(box.x, box.y, box.width, box.height);
+                        if (drawBox) {
+                            ctx.strokeStyle = strokeStyle;
+                            ctx.lineWidth = 3;
+                            ctx.strokeRect(box.x, box.y, box.width, box.height);
 
-                        ctx.fillStyle = strokeStyle;
-                        ctx.font = 'bold 14px sans-serif';
-                        ctx.fillRect(box.x, box.y - 24, ctx.measureText(labelText).width + 16, 24);
-                        ctx.fillStyle = '#ffffff';
-                        ctx.fillText(labelText, box.x + 8, box.y - 7);
+                            ctx.fillStyle = strokeStyle;
+                            ctx.font = 'bold 14px sans-serif';
+                            ctx.fillRect(box.x, box.y - 24, ctx.measureText(labelText).width + 16, 24);
+                            ctx.fillStyle = '#ffffff';
+                            ctx.fillText(labelText, box.x + 8, box.y - 7);
+                        }
                     });
                 }
             }, 250);
@@ -1491,17 +1554,10 @@
             const now = Date.now();
             const todayStr = new Date().toDateString(); 
             
-            if (chkReportAlways && !chkReportAlways.checked) {
-                if (loggedToday[name] === todayStr) {
-                    return; 
-                }
-            } else {
-                if (lastSeen[name] && (now - lastSeen[name] < COOLDOWN_MS)) {
-                    return; 
-                }
-            }
+            // Las validaciones de cooldown ahora se hacen antes de llamar a esta función 
+            // en el startScanLoop() para controlar mejor el apartado gráfico.
             
-            lastSeen[name] = now;
+            lastLoggedTime[name] = now;
             loggedToday[name] = todayStr;
             
             const role = userRoles[name] || 'Sin asignar';
@@ -1621,7 +1677,7 @@
             attendanceLogContainer.innerHTML = `<div class="text-center text-xs text-slate-500 py-8" id="emptyLogMsg">No se registran marcas de ingreso.</div>`;
             totalAttendanceDisplay.innerText = "0";
             
-            for (let key in lastSeen) delete lastSeen[key];
+            for (let key in lastLoggedTime) delete lastLoggedTime[key];
             for (let key in loggedToday) delete loggedToday[key];
             
             showToast("Marcas del día de hoy limpiadas.", "info");
