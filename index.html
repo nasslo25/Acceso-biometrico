@@ -610,7 +610,11 @@
             if (!currentUser || !isFirebaseActive) return;
 
             try {
-                const profilesRef = collection(db, 'artifacts', appId, 'users', currentUser.uid, 'biometricProfiles');
+                // Intentar migrar automáticamente perfiles antiguos si existen en este navegador
+                await migrateOldProfilesToGlobal();
+
+                // Ruta compartida global para que todos los dispositivos lean los mismos rostros
+                const profilesRef = collection(db, 'artifacts', appId, 'shared', 'global_access', 'biometricProfiles');
                 const snapshot = await getDocs(profilesRef);
                 
                 registeredProfiles = [];
@@ -641,6 +645,31 @@
             }
         }
 
+        // FUNCIÓN DE MIGRACIÓN AUTOMÁTICA DE REGISTROS ANTIGUOS
+        async function migrateOldProfilesToGlobal() {
+            try {
+                const oldProfilesRef = collection(db, 'artifacts', appId, 'users', currentUser.uid, 'biometricProfiles');
+                const oldSnapshot = await getDocs(oldProfilesRef);
+
+                if (!oldSnapshot.empty) {
+                    const globalProfilesRef = collection(db, 'artifacts', appId, 'shared', 'global_access', 'biometricProfiles');
+                    let count = 0;
+
+                    for (const docSnap of oldSnapshot.docs) {
+                        const data = docSnap.data();
+                        await setDoc(doc(globalProfilesRef, docSnap.id), data);
+                        count++;
+                    }
+
+                    if (count > 0) {
+                        showToast(`¡Se migró exitosamente tu base de ${count} personas a la nube global!`, "success");
+                    }
+                }
+            } catch (error) {
+                // Si no hay registros en la ruta antigua de este equipo, no hace nada
+            }
+        }
+
         async function saveProfileToCloud(name, role, faceDescriptorRaw) {
             if (!currentUser || !isFirebaseActive) {
                 showToast("Guardado local: El perfil se mantendrá solo durante esta sesión.", "info");
@@ -648,7 +677,8 @@
             }
 
             try {
-                const profilesRef = collection(db, 'artifacts', appId, 'users', currentUser.uid, 'biometricProfiles');
+                // Guardado en la ruta compartida global
+                const profilesRef = collection(db, 'artifacts', appId, 'shared', 'global_access', 'biometricProfiles');
                 const plainArray = Array.from(faceDescriptorRaw);
                 
                 await setDoc(doc(profilesRef, name), {
@@ -671,7 +701,7 @@
         async function saveAttendanceToCloud(record) {
             if (!currentUser || !isFirebaseActive) return;
             try {
-                const logsRef = collection(db, 'artifacts', appId, 'users', currentUser.uid, 'attendanceLogs');
+                const logsRef = collection(db, 'artifacts', appId, 'shared', 'global_access', 'attendanceLogs');
                 const docId = `${record.name}_${record.timestamp}`;
                 await setDoc(doc(logsRef, docId), record);
             } catch (error) {
@@ -683,7 +713,7 @@
             if (!currentUser || !isFirebaseActive) return;
             try {
                 const todayStr = new Date().toDateString();
-                const logsRef = collection(db, 'artifacts', appId, 'users', currentUser.uid, 'attendanceLogs');
+                const logsRef = collection(db, 'artifacts', appId, 'shared', 'global_access', 'attendanceLogs');
                 
                 // Con el fin de cumplir estrictamente la Regla 2 (No queries complejas, no orderBy y no where compuestos)
                 // y para soportar reportes históricos sin fallar, descargamos y filtramos de forma segura en memoria JS.
@@ -1207,7 +1237,7 @@
             if (currentUser && isFirebaseActive) {
                 try {
                     const todayStr = new Date().toDateString();
-                    const logsRef = collection(db, 'artifacts', appId, 'users', currentUser.uid, 'attendanceLogs');
+                    const logsRef = collection(db, 'artifacts', appId, 'shared', 'global_access', 'attendanceLogs');
                     
                     // Solo borramos las marcas correspondientes a HOY para no perder el registro histórico general
                     const snapshot = await getDocs(logsRef);
@@ -1215,7 +1245,7 @@
                     snapshot.forEach(docSnap => {
                         const data = docSnap.data();
                         if (data.dateStr === todayStr) {
-                            promises.push(deleteDoc(doc(db, 'artifacts', appId, 'users', currentUser.uid, 'attendanceLogs', docSnap.id)));
+                            promises.push(deleteDoc(doc(db, 'artifacts', appId, 'shared', 'global_access', 'attendanceLogs', docSnap.id)));
                         }
                     });
                     await Promise.all(promises);
@@ -1276,7 +1306,7 @@
             lucide.createIcons();
 
             try {
-                const logsRef = collection(db, 'artifacts', appId, 'users', currentUser.uid, 'attendanceLogs');
+                const logsRef = collection(db, 'artifacts', appId, 'shared', 'global_access', 'attendanceLogs');
                 
                 // Obtenemos todo el histórico y filtramos localmente en memoria (REGLA 2)
                 const snapshot = await getDocs(logsRef);
