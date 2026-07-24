@@ -273,7 +273,7 @@
     <main class="flex-1 flex flex-col lg:flex-row overflow-hidden relative">
         
         <!-- PANEL IZQUIERDO: REGISTRO DE PERSONAS -->
-        <section id="panelRegister" class="w-full lg:w-[320px] bg-slate-900 border-r border-slate-800 flex flex-col shrink-0 z-10 shadow-lg lg:flex hidden">
+        <section id="panelRegister" class="w-full lg:w-[320px] bg-slate-900 border-r border-slate-800 flex-col shrink-0 z-10 shadow-lg hidden">
             <div class="p-5 border-b border-slate-800 bg-slate-900/50">
                 <h2 class="text-sm font-semibold uppercase tracking-wider text-slate-300 mb-4 flex items-center gap-2">
                     <i data-lucide="user-plus" class="w-4 h-4 text-emerald-400"></i> Registrar Persona
@@ -362,7 +362,7 @@
                 </div>
 
                 <!-- MINI VENTANA FLOTANTE: CÁMARA 1 (REGISTRO ENROLADO) -->
-                <div id="pipCamera1" class="absolute top-3 left-3 w-28 sm:w-44 md:w-56 bg-slate-900/95 backdrop-blur-md border border-slate-700/60 rounded-xl md:rounded-2xl p-1.5 md:p-2.5 shadow-2xl z-30 flex flex-col gap-1.5 md:gap-2 transition-all hover:scale-[1.02]">
+                <div id="pipCamera1" class="absolute top-3 left-3 w-28 sm:w-44 md:w-56 bg-slate-900/95 backdrop-blur-md border border-slate-700/60 rounded-xl md:rounded-2xl p-1.5 md:p-2.5 shadow-2xl z-30 hidden flex-col gap-1.5 md:gap-2 transition-all hover:scale-[1.02]">
                     <div class="flex items-center justify-between gap-1">
                         <div class="flex items-center gap-1 shrink-0">
                             <span class="w-1 h-1 md:w-1.5 md:h-1.5 rounded-full bg-cyan-400 animate-pulse"></span>
@@ -439,7 +439,7 @@
 
     <!-- BARRA DE NAVEGACIÓN MÓVIL (Solo visible en pantallas < lg) -->
     <nav id="mobileNav" class="lg:hidden bg-slate-900 border-t border-slate-800 px-2 py-3 flex justify-around items-center shrink-0 z-30 shadow-2xl">
-        <button id="tabRegister" class="flex flex-col items-center gap-1.5 text-slate-400 hover:text-cyan-400 transition py-2 px-4 rounded-xl min-w-[80px]">
+        <button id="tabRegister" class="hidden flex-col items-center gap-1.5 text-slate-400 hover:text-cyan-400 transition py-2 px-4 rounded-xl min-w-[80px]">
             <i data-lucide="user-plus" class="w-6 h-6"></i>
             <span class="text-[10px] md:text-xs font-bold">Registro</span>
         </button>
@@ -604,7 +604,7 @@
             panelAttendance.classList.add('hidden');
             panelAttendance.classList.remove('flex');
 
-            if (activeTab === 'register') {
+            if (activeTab === 'register' && activeSessionUser && activeSessionUser.isAdmin) {
                 tabRegister.classList.add('text-cyan-400', 'bg-slate-800/50');
                 tabRegister.classList.remove('text-slate-400');
                 panelRegister.classList.remove('hidden');
@@ -638,10 +638,10 @@
                 // Solo muestra el panel izquierdo si es administrador
                 if (activeSessionUser && activeSessionUser.isAdmin) {
                     panelRegister.classList.remove('hidden');
-                    panelRegister.classList.add('flex');
+                    panelRegister.classList.add('flex', 'lg:flex');
                 } else {
                     panelRegister.classList.add('hidden');
-                    panelRegister.classList.remove('flex');
+                    panelRegister.classList.remove('flex', 'lg:flex');
                 }
                 
                 panelScanner.classList.remove('hidden');
@@ -1003,11 +1003,14 @@
                 
                 // Mostrar herramientas de registro y PiP para Admin
                 pipCamera1.classList.remove('hidden');
+                pipCamera1.classList.add('flex');
+                
                 tabRegister.classList.remove('hidden');
                 tabRegister.classList.add('flex');
+                
                 if(window.innerWidth >= 1024) {
                     panelRegister.classList.remove('hidden');
-                    panelRegister.classList.add('flex');
+                    panelRegister.classList.add('flex', 'lg:flex');
                 }
             } else {
                 adminTag.classList.add('hidden');
@@ -1019,10 +1022,13 @@
                 
                 // Modo Solo Lectura para Usuarios Comunes
                 pipCamera1.classList.add('hidden');
+                pipCamera1.classList.remove('flex');
+                
                 tabRegister.classList.add('hidden');
                 tabRegister.classList.remove('flex');
+                
                 panelRegister.classList.add('hidden');
-                panelRegister.classList.remove('flex');
+                panelRegister.classList.remove('flex', 'lg:flex');
                 
                 // Si estaba en la pestaña de registro móvil, moverlo al escáner
                 if (tabRegister.classList.contains('text-cyan-400')) {
@@ -1039,6 +1045,16 @@
             userInfoBadge.classList.add('hidden');
             btnOpenUserMgmt.classList.add('hidden');
             btnOpenDepMgmt.classList.add('hidden');
+            
+            // Ocultar vistas de admin al salir
+            pipCamera1.classList.add('hidden');
+            pipCamera1.classList.remove('flex');
+            tabRegister.classList.add('hidden');
+            tabRegister.classList.remove('flex');
+            panelRegister.classList.add('hidden');
+            panelRegister.classList.remove('flex', 'lg:flex');
+            switchTab('scanner');
+
             loginModal.classList.remove('hidden');
             showToast("Sesión cerrada correctamente.", "info");
         });
